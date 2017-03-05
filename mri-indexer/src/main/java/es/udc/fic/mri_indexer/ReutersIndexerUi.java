@@ -17,7 +17,24 @@ public class ReutersIndexerUi {
 		      System.out.println(usage);
 		      System.exit(0);
 	    }
-		    
+	    
+	    String openmode = "openmode"; //no se si esto sera asi
+	    String index = "index";
+	    
+	    for(int i = 0;i < args.length;i++) {
+		
+		if ("-openmode".equals(args[i])) {
+		    openmode = args[i+1];
+		    if ((! openmode.equals("append")) || (! openmode.equals("create"))
+			    || (! openmode.equals("append_or_create"))){
+			openmode = "append_or_create";
+		    }
+		    i++;
+		}else if ("-index".equals(args[i])) {
+		    index = args[i+1];
+		    i++;
+		}
+	    }
 		    
 		    
     }
