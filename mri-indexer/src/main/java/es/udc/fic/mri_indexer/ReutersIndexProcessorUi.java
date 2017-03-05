@@ -13,7 +13,8 @@ public class ReutersIndexProcessorUi {
 	
 	String indexin = null;
 	String field = null;
-	Integer n = null; 
+	Integer n = null;
+	Integer processing_type = null;
 	
 	for (int i = 0; i < args.length; i++) {
 	    if ("-indexin".equals(args[i])) {
@@ -22,27 +23,41 @@ public class ReutersIndexProcessorUi {
 	    }else if ("-best_idfterms".equals(args[i])) {
 		field = args[i + 1];
 		n = Integer.getInteger(args[i + 2]);
+		processing_type = 0;
 		i = i+2;
 	    }else if ("-poor_idfterms".equals(args[i])) {
 		field = args[i + 1];
 		n = Integer.getInteger(args[i + 2]);
+		processing_type = 1;
 		i = i+2;
 	    }else if ("-best_tfidfterms".equals(args[i])) {
 		field = args[i + 1];
 		n = Integer.getInteger(args[i + 2]);
+		processing_type = 2;
 		i = i+2;
 	    }else if ("-poor_tfidfterms".equals(args[i])) {
 		field = args[i + 1];
 		n = Integer.getInteger(args[i + 2]);
+		processing_type = 3;
 		i = i+2;
 	    }
 	}
 
-	if (indexin == null || field == null || n == null){
+	if (indexin == null || field == null || n == null || processing_type == null){
 	    print_usage_and_exit();
 	}
 	CheckIndexOrDocumentDirectories.check_directory(indexin, true);
 	
+	switch (processing_type){
+	case 0 : //do something;
+	    	break;
+	case 1 : //do something;
+	    	break;
+	case 2 : //do something;
+	    	break;
+	case 3 : //do something;
+	    	break;
+	}
 	
     }
 
