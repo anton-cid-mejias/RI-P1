@@ -5,16 +5,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 
 public class ReutersIndexerUi {
     
     public static void main(String[] args) {
-	    String usage =
-		      "Usage: Indexing options [-openmode openmode] [-index pathname] [-coll pathname] "
-		      + "[-colls pathname_1 ... pathname_n] [-indexes1 pathname_0 pathname_1 ... pathname_n] "
-		      + "[-indexes2 pathname_0] \n";
 	    /*
 		      + "Index proccessing options [-indexin indexfile] [-best_idfterms field n] "
 		      + "[-poor_idfterms field n] [-best_tfidfterms field n] [-poor_tfidfterms field n] \n"
@@ -28,7 +23,7 @@ public class ReutersIndexerUi {
 	    }
 	    
 	    String openmodeString = null;
-	    IndexWriterConfig.OpenMode openmode = IndexWriterConfig.OpenMode.CREATE_OR_APPEND;
+	    OpenMode openmode = OpenMode.CREATE_OR_APPEND;
 	    String index = null;
 	    String coll = null;
 	    List<String> colls = new ArrayList<>();
@@ -69,13 +64,13 @@ public class ReutersIndexerUi {
 	    //Openmode will be create_or_append by default
 	    if (openmodeString != null){
 		if(openmodeString.equals("create")){
-		    openmode = IndexWriterConfig.OpenMode.CREATE;
+		    openmode = OpenMode.CREATE;
 		} else if (openmodeString.equals("append")){
-		    openmode = IndexWriterConfig.OpenMode.APPEND;
+		    openmode = OpenMode.APPEND;
 		}
 	    }
 	    
-	    //Check if parametters are correct
+	    //Check if parameters are correct
 	    if (    ((coll != null) && (!colls.isEmpty())) || ((index != null) && !indexes1.isEmpty()) 
 		    || ((index != null) && (indexes2 != null)) || ((index != null) && (indexes2 != null)) 
 		    ){
