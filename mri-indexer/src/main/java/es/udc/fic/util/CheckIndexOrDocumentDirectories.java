@@ -8,17 +8,17 @@ import java.util.List;
 public class CheckIndexOrDocumentDirectories {
 
     public static void check_directory(String directory,
-	    boolean isIndexNotDocument) {
+	    boolean checkWriteNotRead) {
 	final Path docDir = Paths.get(directory);
-	if (isIndexNotDocument) {
+	if (checkWriteNotRead) {
 	    if (!(Files.isDirectory(docDir) && Files.isWritable(docDir))) {
-		System.out.println("Index directory '" + docDir.toAbsolutePath()
-			+ "' does not exist or is not readable, please check the path");
+		System.out.println("Directory '" + docDir.toAbsolutePath()
+			+ "' does not exist or is not writeable, please check the path");
 		System.exit(1);
 	    }
 	} else {
 	    if (!(Files.isDirectory(docDir) && Files.isReadable(docDir))) {
-		System.out.println("Document directory '"
+		System.out.println("Directory '"
 			+ docDir.toAbsolutePath()
 			+ "' does not exist or is not readable, please check the path");
 		System.exit(1);
@@ -27,9 +27,9 @@ public class CheckIndexOrDocumentDirectories {
     }
 
     public static void check_directories(List<String> directories,
-	    boolean isIndexNotDocument) {
+	    boolean checkWriteNotRead) {
 	for (String directory : directories) {
-	    check_directory(directory, isIndexNotDocument);
+	    check_directory(directory, checkWriteNotRead);
 	}
     }
     
