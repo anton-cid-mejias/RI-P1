@@ -55,6 +55,9 @@ public class ReutersIndexerUi {
 			indexes1.add(args[i+1]);
 			i++;
 		    }
+		    if (indexes1.size() < 2) {
+			print_usage_and_exit();
+		    }
 		}else if ("-indexes2".equals(args[i])) {
 		    indexes2 = args[i+1];
 		    i++;
