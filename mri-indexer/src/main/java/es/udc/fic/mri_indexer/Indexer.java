@@ -39,35 +39,33 @@ public class Indexer {
 	this.colls = colls;
     }
 
-    public void run() throws IOException{
+    public void run() throws IOException {
 	try {
 	    System.out.println("Indexing to directory '" + index + "'...");
-        	
+
 	    Directory dir = FSDirectory.open(Paths.get(index));
 	    Analyzer analyzer = new StandardAnalyzer();
 	    IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-        	
+
 	    iwc.setOpenMode(openmode);
-        
+
 	    IndexWriter writer = new IndexWriter(dir, iwc);
-	    
+
 	    Path docDir = null;
-	    for (String docsPath : colls){
+	    for (String docsPath : colls) {
 		docDir = Paths.get(docsPath);
 		indexDocs(writer, docDir);
 	    }
-	    
-        	
+
 	    writer.close();
-        } catch (IOException e) {
-            System.out.println(" caught a " + e.getClass() +
-		"\n with message: " + e.getMessage());
+	} catch (IOException e) {
+	    System.out.println(" caught a " + e.getClass() + "\n with message: "
+		    + e.getMessage());
 	}
     }
-    
-    
+
     //
-    
+
     static void indexDocs(final IndexWriter writer, Path path)
 	    throws IOException {
 	if (Files.isDirectory(path)) {
@@ -108,9 +106,9 @@ public class Indexer {
     /** Indexes a single document */
     static void indexDoc(IndexWriter writer, Path file, long lastModified)
 	    throws IOException {
-	
-	//ESTO HACE FALTA EL PARSER DE ANTON
-	
+
+	// ESTO HACE FALTA EL PARSER DE ANTON
+
 	try (InputStream stream = Files.newInputStream(file)) {
 	    Document doc = new Document();
 
@@ -142,6 +140,9 @@ public class Indexer {
 	    doc.add(new TextField("contents", new BufferedReader(
 		    new InputStreamReader(stream, StandardCharsets.UTF_8))));
 
+	    //MUCHO OJO CON ESTO, solo deberia crear una vez el documento si hay que crearlo
+	    
+	    
 	    if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
 		// New index, so we just add the document (no old document can
 		// be there):
@@ -158,10 +159,7 @@ public class Indexer {
 	    }
 	}
     }
-    
-    
-    
+
     //
-    
-    
+
 }
