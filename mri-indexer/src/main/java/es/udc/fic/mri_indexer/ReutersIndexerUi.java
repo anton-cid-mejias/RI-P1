@@ -1,5 +1,8 @@
 package es.udc.fic.mri_indexer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ReutersIndexerUi {
     
     public static void main(String[] args) {
@@ -18,21 +21,32 @@ public class ReutersIndexerUi {
 		      System.exit(0);
 	    }
 	    
-	    String openmode = "openmode"; //no se si esto sera asi
+	    String openmode = "openmode"; //no se si esto sera string
 	    String index = "index";
+	    String coll = "col";
+	    List<String> colls = new ArrayList<>();
 	    
 	    for(int i = 0;i < args.length;i++) {
-		
 		if ("-openmode".equals(args[i])) {
 		    openmode = args[i+1];
 		    if ((! openmode.equals("append")) || (! openmode.equals("create"))
 			    || (! openmode.equals("append_or_create"))){
-			openmode = "append_or_create";
+			System.out.println(usage);
+			System.exit(0);
 		    }
 		    i++;
+		    
 		}else if ("-index".equals(args[i])) {
 		    index = args[i+1];
 		    i++;
+		}else if ("-coll".equals(args[i])) {
+		    coll = args[i+1];
+		    i++;
+		}else if ("-colls".equals(args[i])) {
+		    while ( !((args[i+1]).charAt(0) == '-')){
+			colls.add(args[i+1]);
+			i++;
+		    }
 		}
 	    }
 		    
