@@ -25,17 +25,18 @@ public class ReutersIndexerUi {
 	    String index = "index";
 	    String coll = "col";
 	    List<String> colls = new ArrayList<>();
+	    List<String> indexes1 = new ArrayList<>();
+	    String indexes2 = "indexes2";
 	    
 	    for(int i = 0;i < args.length;i++) {
 		if ("-openmode".equals(args[i])) {
 		    openmode = args[i+1];
 		    if ((! openmode.equals("append")) || (! openmode.equals("create"))
 			    || (! openmode.equals("append_or_create"))){
-			System.out.println(usage);
-			System.exit(0);
+			System.err.println("Openmode must be: append, create or append_or_create.");
+		        System.exit(1);
 		    }
 		    i++;
-		    
 		}else if ("-index".equals(args[i])) {
 		    index = args[i+1];
 		    i++;
@@ -47,6 +48,14 @@ public class ReutersIndexerUi {
 			colls.add(args[i+1]);
 			i++;
 		    }
+		}else if ("-indexes1".equals(args[i])) {
+		    while ( !((args[i+1]).charAt(0) == '-')){
+			indexes1.add(args[i+1]);
+			i++;
+		    }
+		}else if ("-indexes2".equals(args[i])) {
+		    indexes2 = args[i+1];
+		    i++;
 		}
 	    }
 		    
