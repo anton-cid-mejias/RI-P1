@@ -13,15 +13,10 @@ public class ReutersIndexerUi {
 		      + "[-deldocsterm field term] [-mostsimilardoc_title h] [-mostsimilardoc_body n h] "
 		      + "[-mostsimilardoc_title h y -mostsimilardoc_body n h d] \n";
 
-	    if (args.length == 0){
+	    if ((args.length == 0) || (args.length > 0 && ("-h".equals(args[0]) || "-help".equals(args[0])))){
 		      System.out.println(usage);
 		      System.exit(0);
 	    }
-	    if (args.length > 0 && ("-h".equals(args[0]) || "-help".equals(args[0]))) {
-		      System.out.println(usage);
-		      System.exit(0);
-	    }
-		    
 		    
 		    
 		    
