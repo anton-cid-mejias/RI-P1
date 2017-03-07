@@ -9,10 +9,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.IntPoint;
@@ -143,10 +147,21 @@ public class Indexer {
     }
     
     private String processDate(String date){
-	return null;
+	Date parsedDate = null;
+	SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss.SS");
+	try {
+	    parsedDate = format.parse(date);
+	} catch (ParseException e) {
+	    System.out.println("Date field was not correct");
+	    e.printStackTrace();
+	}
+	String luceneDateString = DateTools.dateToString(parsedDate, DateTools.Resolution.MILLISECOND);
+	return luceneDateString;
     }
     
     static boolean check_sgm(Path file) {
+	// reut2-xxx.sgm? de momento acepta cualquier .sgm
+	
 	String extension = "";
 	String fileName = file.toString();
 	int i = fileName.lastIndexOf('.');
