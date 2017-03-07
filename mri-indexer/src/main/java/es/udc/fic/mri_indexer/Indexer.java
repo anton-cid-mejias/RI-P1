@@ -97,7 +97,7 @@ public class Indexer {
 		    .parseString(new StringBuffer(this.toString(stream)));
 	   
 	   int number = 1; 
-	   for (List<String> reuter : reuters){
+	   for (List<String> reuter : reuters){ 
 	       Document doc = new Document();
 	       //Path of the file indexed
 	       Field pathsgmField = new StringField("Pathsgm", file.toString(), Field.Store.YES);
@@ -110,7 +110,7 @@ public class Indexer {
 	       Field title = new TextField("TITLE", reuter.get(0), Field.Store.YES);
 	       doc.add(title);
 	       //BODY of the reuter
-	       Field body = new TextField("BODY", reuter.get(1), Field.Store.YES);
+	       Field body = new TextField("BODY", reuter.get(1), Field.Store.NO);
 	       doc.add(body);
 	       //TOPICS of the reuter
 	       Field topics = new TextField("TOPICS", reuter.get(2), Field.Store.YES);
