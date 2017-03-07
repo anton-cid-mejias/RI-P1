@@ -9,11 +9,32 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import examples.ThreadPoolExample.WorkerThread;
-
 public class ThreadsMaster {
 
+	public static class WorkerThread implements Runnable {
+
+		private final Path folder;
+
+		public WorkerThread(final Path folder) {
+			this.folder = folder;
+		}
+
+		/**
+		 * This is the work that the current thread will do when processed by
+		 * the pool. In this case, it will only print some information.
+		 */
+		@Override
+		public void run() {
+			System.out.println(String.format("I am the thread '%s' and I am responsible for folder '%s'",
+					Thread.currentThread().getName(), folder));
+		}
+
+	}
+    
+    
     public static void indexes1 (String[] colls, String[] indexes){
+	final String finalIndex = indexes[0];
+	
 	
     }
     
