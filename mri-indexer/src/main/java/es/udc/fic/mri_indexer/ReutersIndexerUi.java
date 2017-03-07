@@ -72,7 +72,7 @@ public class ReutersIndexerUi {
 	if (((coll != null) && (!colls.isEmpty()))
 		|| ((index != null) && !indexes1.isEmpty())
 		|| ((index != null) && (indexes2 != null))
-		|| ((index != null) && (indexes2 != null))) {
+		|| (!indexes1.isEmpty() && (indexes2 != null))) {
 	    print_usage_and_exit();
 	} else if (index != null) {
 	    CheckIndexOrDocumentDirectories.check_directory(index, true);

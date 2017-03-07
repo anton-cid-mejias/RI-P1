@@ -11,14 +11,14 @@ public class ReutersIndexProcessorUi {
 	    print_usage_and_exit();
 	}
 	
-	String indexin = null;
+	String indexfile = null;
 	String field = null;
 	Integer n = null;
 	Integer processing_type = null;
 	
 	for (int i = 0; i < args.length; i++) {
 	    if ("-indexin".equals(args[i])) {
-		indexin = args[i + 1];
+		indexfile = args[i + 1];
 		i++;
 	    }else if ("-best_idfterms".equals(args[i])) {
 		field = args[i + 1];
@@ -43,10 +43,11 @@ public class ReutersIndexProcessorUi {
 	    }
 	}
 
-	if (indexin == null || field == null || n == null || processing_type == null){
+	if (indexfile == null || field == null || n == null || processing_type == null){
 	    print_usage_and_exit();
 	}
-	CheckIndexOrDocumentDirectories.check_directory(indexin, true);
+	CheckIndexOrDocumentDirectories.check_directory(indexfile, false);
+	CheckIndexOrDocumentDirectories.check_directory(indexfile, true);
 	
 	switch (processing_type){
 	case 0 : //do something;
