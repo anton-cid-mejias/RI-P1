@@ -1,16 +1,12 @@
 package es.udc.fic.mri_indexer;
 
 import java.io.ByteArrayOutputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
@@ -20,7 +16,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
@@ -67,19 +62,7 @@ public class Indexer {
 	}
     }
 
-    private String toString(InputStream stream) throws IOException {
-	ByteArrayOutputStream result = new ByteArrayOutputStream();
-	byte[] buffer = new byte[1024];
-	int length;
-	while ((length = stream.read(buffer)) != -1) {
-	    result.write(buffer, 0, length);
-	}
-	return result.toString("UTF-8");
-    }
-    
-    private String processDate(String date){
-	return null;
-    }
+
 
     private void indexDocs(final IndexWriter writer, Path path)
 	    throws IOException {
@@ -149,6 +132,20 @@ public class Indexer {
 	
     }
 
+    private String toString(InputStream stream) throws IOException {
+	ByteArrayOutputStream result = new ByteArrayOutputStream();
+	byte[] buffer = new byte[1024];
+	int length;
+	while ((length = stream.read(buffer)) != -1) {
+	    result.write(buffer, 0, length);
+	}
+	return result.toString("UTF-8");
+    }
+    
+    private String processDate(String date){
+	return null;
+    }
+    
     static boolean check_sgm(Path file) {
 	String extension = "";
 	String fileName = file.toString();
