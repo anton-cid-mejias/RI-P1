@@ -89,6 +89,10 @@ public class ReutersIndexerUi {
 	} else if (!indexes1.isEmpty()) {
 	    CheckIndexOrDocumentDirectories.check_directories(indexes1, true);
 	    if (!colls.isEmpty()) {
+		if (colls.size() != (indexes1.size() -1)){
+		    System.out.println("There must be as many indexes as document folders");
+		    System.exit(1);
+		}
 		CheckIndexOrDocumentDirectories.check_directories(colls, false);
 		// call to indexing function
 	    } else {

@@ -13,6 +13,12 @@ import examples.ThreadPoolExample.WorkerThread;
 
 public class ThreadsMaster {
 
+    public static void indexes1 (String[] colls, String[] indexes){
+	
+    }
+    
+    
+    //Este main no vale un carajo pero lo mantengo para referencia, se quitará
     public static void main(final String[] args) {
 
 	if (args.length != 1) {
