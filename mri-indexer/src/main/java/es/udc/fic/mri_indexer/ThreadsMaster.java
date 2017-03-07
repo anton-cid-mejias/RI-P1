@@ -5,6 +5,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +35,13 @@ public class ThreadsMaster {
     
     public static void indexes1 (String[] colls, String[] indexes){
 	final String finalIndex = indexes[0];
+	//Removing first index, that way colls and indexes are directly corresponding
+	indexes = Arrays.copyOfRange(indexes, 1, indexes.length);
+	int numThreads = colls.length;
+	
+	final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+	
+	
 	
 	
     }
