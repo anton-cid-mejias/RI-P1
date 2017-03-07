@@ -31,17 +31,8 @@ import org.apache.lucene.store.FSDirectory;
 
 public class Indexer {
 
-    private OpenMode openmode;
-    private String index;
-    private List<String> colls;
-
-    public Indexer(OpenMode openmode, String index, List<String> colls) {
-	this.openmode = openmode;
-	this.index = index;
-	this.colls = colls;
-    }
-
-    public void run() throws IOException {
+    public static void run(OpenMode openmode, String index, List<String> colls)
+	    throws IOException {
 	try {
 	    System.out.println("Indexing to directory '" + index + "'...");
 
@@ -66,9 +57,7 @@ public class Indexer {
 	}
     }
 
-
-
-    private void indexDocs(final IndexWriter writer, Path path)
+    private static void indexDocs(final IndexWriter writer, Path path)
 	    throws IOException {
 	if (Files.isDirectory(path)) {
 	    Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -90,53 +79,60 @@ public class Indexer {
 	    indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis());
 	}
     }
-    
-    private void indexDoc(IndexWriter writer, Path file, long lastModified) throws IOException {
+
+    private static void indexDoc(IndexWriter writer, Path file,
+	    long lastModified) throws IOException {
 	try (InputStream stream = Files.newInputStream(file)) {
-	   List<List<String>> reuters = Reuters21578Parser
-		    .parseString(new StringBuffer(this.toString(stream)));
-	   
-	   int number = 1; 
-	   for (List<String> reuter : reuters){ 
-	       Document doc = new Document();
-	       //Path of the file indexed
-	       Field pathsgmField = new StringField("Pathsgm", file.toString(), Field.Store.YES);
-	       doc.add(pathsgmField);
-	       //Order number in the document
-	       Field seqDocNumberField = new IntPoint("SeqDocNumber",number);
-	       doc.add(seqDocNumberField);
-	       number ++;
-	       //TITLE of the reuter
-	       Field title = new TextField("TITLE", reuter.get(0), Field.Store.YES);
-	       doc.add(title);
-	       //BODY of the reuter
-	       Field body = new TextField("BODY", reuter.get(1), Field.Store.YES);
-	       doc.add(body);
-	       //TOPICS of the reuter
-	       Field topics = new TextField("TOPICS", reuter.get(2), Field.Store.YES);
-	       doc.add(topics);
-	       //DATELINE of the reuter
-	       Field dateline = new TextField("DATELINE", reuter.get(3), Field.Store.YES);
-	       doc.add(dateline);
-	       //DATE of the reuter
-	       Field date = new StringField("DATE", this.processDate(reuter.get(4)), Field.Store.YES);
-	       doc.add(date);
-	       
-	       if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
-		   System.out.println("adding " + file);
-		   writer.addDocument(doc);
-	       } else {
-		   System.out.println("updating " + file);
-		   writer.updateDocument(new Term("path", file.toString()), doc);
-	       }
+	    List<List<String>> reuters = Reuters21578Parser
+		    .parseString(new StringBuffer(toString(stream)));
 
+	    int number = 1;
+	    for (List<String> reuter : reuters) {
+		Document doc = new Document();
+		// Path of the file indexed
+		Field pathsgmField = new StringField("Pathsgm", file.toString(),
+			Field.Store.YES);
+		doc.add(pathsgmField);
+		// Order number in the document
+		Field seqDocNumberField = new IntPoint("SeqDocNumber", number);
+		doc.add(seqDocNumberField);
+		number++;
+		// TITLE of the reuter
+		Field title = new TextField("TITLE", reuter.get(0),
+			Field.Store.YES);
+		doc.add(title);
+		// BODY of the reuter
+		Field body = new TextField("BODY", reuter.get(1),
+			Field.Store.NO);
+		doc.add(body);
+		// TOPICS of the reuter
+		Field topics = new TextField("TOPICS", reuter.get(2),
+			Field.Store.YES);
+		doc.add(topics);
+		// DATELINE of the reuter
+		Field dateline = new TextField("DATELINE", reuter.get(3),
+			Field.Store.YES);
+		doc.add(dateline);
+		// DATE of the reuter
+		Field date = new StringField("DATE",
+			processDate(reuter.get(4)), Field.Store.YES);
+		doc.add(date);
 
-	   }
+		if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
+		    System.out.println("adding " + file);
+		    writer.addDocument(doc);
+		} else {
+		    System.out.println("updating " + file);
+		    writer.updateDocument(new Term("path", file.toString()),
+			    doc);
+		}
+
+	    }
 	}
-	
+
     }
 
-    private String toString(InputStream stream) throws IOException {
+    private static String toString(InputStream stream) throws IOException {
 	ByteArrayOutputStream result = new ByteArrayOutputStream();
 	byte[] buffer = new byte[1024];
 	int length;
@@ -145,23 +141,25 @@ public class Indexer {
 	}
 	return result.toString("UTF-8");
     }
-    
-    private String processDate(String date){
+
+    private static String processDate(String date) {
 	Date parsedDate = null;
-	SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss.SS");
+	SimpleDateFormat format = new SimpleDateFormat(
+		"dd-MMM-yyyy HH:mm:ss.SS");
 	try {
 	    parsedDate = format.parse(date);
 	} catch (ParseException e) {
 	    System.out.println("Date field was not correct");
 	    e.printStackTrace();
 	}
-	String luceneDateString = DateTools.dateToString(parsedDate, DateTools.Resolution.MILLISECOND);
+	String luceneDateString = DateTools.dateToString(parsedDate,
+		DateTools.Resolution.MILLISECOND);
 	return luceneDateString;
     }
-    
-    static boolean check_sgm(Path file) {
+
+    private static boolean check_sgm(Path file) {
 	// reut2-xxx.sgm? de momento acepta cualquier .sgm
-	
+
 	String extension = "";
 	String fileName = file.toString();
 	int i = fileName.lastIndexOf('.');
