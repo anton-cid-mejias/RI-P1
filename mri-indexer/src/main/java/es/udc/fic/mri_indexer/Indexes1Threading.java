@@ -34,11 +34,9 @@ public class Indexes1Threading {
 
 	@Override
 	public void run() {
-	    System.out.println(String.format(
-		    "I am the thread '%s' and I am responsible for folder none",
-		    Thread.currentThread().getName()));
+	    //Thread.currentThread().getName())
+	    //InetAddress.getLocalHost().getHostName()
 
-	    //
 
 	    try (DirectoryStream<Path> directoryStream = Files
 		    .newDirectoryStream(Paths.get(documentDirectory))) {
@@ -53,9 +51,7 @@ public class Indexes1Threading {
 		e.printStackTrace();
 		System.exit(-1);
 	    }
-	    //
 	}
-
     }
 
     public static void startThreads(String[] colls, String[] indexes) {
