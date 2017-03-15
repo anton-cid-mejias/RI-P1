@@ -32,8 +32,8 @@ public class Indexes2Threading {
 
 	@Override
 	public void run() {
-	    //Thread.currentThread().getName())
-	    //InetAddress.getLocalHost().getHostName()
+	    //Thread.currentThread().getName())     es un string
+	    //InetAddress.getLocalHost().getHostName()   tb es un string
 
 	    // USA EL WRITER PARA CADA COSA
 	}

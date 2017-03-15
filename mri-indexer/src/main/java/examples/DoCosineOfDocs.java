@@ -7,6 +7,7 @@ public class DoCosineOfDocs {
 	/**
 	 * @param args
 	 */
+    /*
 	public static void main(String[] args) {
 		String d1 = "uno uno";
 		String d2 = "uno dos uno dos";
@@ -29,4 +30,5 @@ public class DoCosineOfDocs {
 		System.out.println();
 
 	}
+	*/
 }

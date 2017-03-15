@@ -1,6 +1,6 @@
 package examples;
 
-import static org.junit.Assert.assertEquals;
+//import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
@@ -47,7 +47,7 @@ public class SimpleDemo {
 		QueryParser parser = new QueryParser("fieldname", analyzer);
 		Query query = parser.parse("text");
 		ScoreDoc[] hits = isearcher.search(query, 1000).scoreDocs;
-		assertEquals(1, hits.length);
+		//assertEquals(1, hits.length);
 		// Iterate through the results:
 		for (int i = 0; i < hits.length; i++) {
 			Document hitDoc = isearcher.doc(hits[i].doc);
@@ -55,7 +55,7 @@ public class SimpleDemo {
 			 * assertEquals("This is not the text that was indexed.",
 			 * hitDoc.get("fieldname"));
 			 */
-			assertEquals("This is the text to be indexed.", hitDoc.get("fieldname"));
+			//assertEquals("This is the text to be indexed.", hitDoc.get("fieldname"));
 		}
 		ireader.close();
 		directory.close();

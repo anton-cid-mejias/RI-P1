@@ -10,10 +10,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.RealVector;
+//import org.apache.commons.math3.linear.ArrayRealVector;
+//import org.apache.commons.math3.linear.RealVector;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
+//import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
@@ -29,6 +29,8 @@ import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.BytesRef;
 
 public class CosineDocumentSimilarity {
+    
+    /*
 
 	public static final String CONTENT = "Content";
 
@@ -57,7 +59,7 @@ public class CosineDocumentSimilarity {
 		return directory;
 	}
 
-	/* Indexed, tokenized, stored. */
+	// Indexed, tokenized, stored. 
 	public static final FieldType TYPE_STORED = new FieldType();
 
 	static final IndexOptions options = IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS;
@@ -122,4 +124,6 @@ public class CosineDocumentSimilarity {
 		}
 		return (RealVector) vector.mapDivide(vector.getL1Norm());
 	}
+	
+	*/
 }

@@ -4,7 +4,8 @@ package examples;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
+//import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.IntPoint;
@@ -56,7 +57,8 @@ public class SimpleIndexing2 {
 
 		String indexFolder = args[0];
 
-		IndexWriterConfig config = new IndexWriterConfig(new EnglishAnalyzer());
+		IndexWriterConfig config = new IndexWriterConfig(new StandardAnalyzer());
+			// EnglishAnalyzer());
 		IndexWriter writer = null;
 
 		try {
