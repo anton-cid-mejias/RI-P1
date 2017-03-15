@@ -10,102 +10,73 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import examples.ThreadPoolExample.WorkerThread;
+
 public class ThreadsMaster {
 
-	public static class WorkerThread implements Runnable {
+    // en el thread que queda pon Hostname y Thread
 
-		private final Path folder;
+    public static class WorkerThread implements Runnable {
 
-		public WorkerThread(final Path folder) {
-			this.folder = folder;
-		}
+	private final String documentDirectory;
+	private final String indexDirectory;
 
-		/**
-		 * This is the work that the current thread will do when processed by
-		 * the pool. In this case, it will only print some information.
-		 */
-		@Override
-		public void run() {
-			System.out.println(String.format("I am the thread '%s' and I am responsible for folder '%s'",
-					Thread.currentThread().getName(), folder));
-		}
-
+	public WorkerThread(String documentDirectory, String indexDirectory) {
+	    this.documentDirectory = documentDirectory;
+	    this.indexDirectory = documentDirectory;
 	}
-    
-    
-    public static void indexes1 (String[] colls, String[] indexes){
+
+	@Override
+	public void run() {
+	    System.out.println(String.format(
+		    "I am the thread '%s' and I am responsible for folder none",
+		    Thread.currentThread().getName()));
+
+	    //
+
+	    try (DirectoryStream<Path> directoryStream = Files
+		    .newDirectoryStream(Paths.get(documentDirectory))) {
+
+		for (final Path path : directoryStream) {
+		    if (Files.isDirectory(path)) {
+			// do stuff
+		    }
+		}
+
+	    } catch (final IOException e) {
+		e.printStackTrace();
+		System.exit(-1);
+	    }
+	    //
+	}
+
+    }
+
+    public static void indexes1(String[] colls, String[] indexes) {
 	final String finalIndex = indexes[0];
-	//Removing first index, that way colls and indexes are directly corresponding
+	// Removing first index, that way colls and indexes are directly
+	// corresponding
 	indexes = Arrays.copyOfRange(indexes, 1, indexes.length);
 	int numThreads = colls.length;
-	
-	final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-	
-	
-	
-	
-    }
-    
-    
-    //Este main no vale un carajo pero lo mantengo para referencia, se quitará
-    public static void main(final String[] args) {
 
-	if (args.length != 1) {
-	    System.out.println("Usage: java ThreadPool folder");
-	    return;
+	final ExecutorService executor = Executors
+		.newFixedThreadPool(numThreads);
+
+	for (int i = 0; i < numThreads; i++) {
+	    final Runnable worker = new WorkerThread(colls[i], indexes[i]);
+	    executor.execute(worker);
 	}
 
-	/*
-	 * Create a ExecutorService (ThreadPool is a subclass of
-	 * ExecutorService) with so many thread as cores in the machine. This can
-	 * be tuned according to the resources needed by the threads.
-	 */
-	final int numCores = Runtime.getRuntime().availableProcessors();
-	final ExecutorService executor = Executors.newFixedThreadPool(numCores);
-
-	/*
-	 * We use Java 7 NIO.2 methods for input/output management. More info
-	 * in: http://docs.oracle.com/javase/tutorial/essential/io/fileio.html
-	 *
-	 * We also use Java 7 try-with-resources syntax. More info in:
-	 * https://docs.oracle.com/javase/tutorial/essential/exceptions/
-	 * tryResourceClose.html
-	 */
-	try (DirectoryStream<Path> directoryStream = Files
-		.newDirectoryStream(Paths.get(args[0]))) {
-
-	    /* We process each subfolder in a new thread. */
-	    for (final Path path : directoryStream) {
-		if (Files.isDirectory(path)) {
-		    final Runnable worker = new WorkerThread(path);
-		    /*
-		     * Send the thread to the ThreadPool. It will be processed
-		     * eventually.
-		     */
-		    executor.execute(worker);
-		}
-	    }
-
-	} catch (final IOException e) {
-	    e.printStackTrace();
-	    System.exit(-1);
-	}
-
-	/*
-	 * Close the ThreadPool; no more jobs will be accepted, but all the
-	 * previously submitted jobs will be processed.
-	 */
 	executor.shutdown();
-
-	/* Wait up to 1 hour to finish all the previously submitted jobs */
+	
 	try {
 	    executor.awaitTermination(1, TimeUnit.HOURS);
 	} catch (final InterruptedException e) {
 	    e.printStackTrace();
 	    System.exit(-2);
 	}
-
-	System.out.println("Finished all threads");
+	
+	//usar finalIndex para mezclar todos los índices de index en uno
 
     }
 
