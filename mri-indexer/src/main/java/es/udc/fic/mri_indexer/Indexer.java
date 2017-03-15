@@ -31,12 +31,46 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-import examples.ThreadPoolExample.WorkerThread;
-
 public class Indexer {
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat(
 	    "dd-MMM-yyyy HH:mm:ss.SS", Locale.US);
+
+    public static void run(OpenMode openmode, String index, List<String> colls)
+	    throws IOException {
+	try {
+	    System.out.println("Indexing to directory '" + index + "'...");
+
+	    Directory dir = FSDirectory.open(Paths.get(index));
+	    Analyzer analyzer = new StandardAnalyzer();
+	    IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+
+	    iwc.setOpenMode(openmode);
+
+	    IndexWriter writer = new IndexWriter(dir, iwc);
+
+	    for (String coll : colls) {
+		try (DirectoryStream<Path> directoryStream = Files
+			.newDirectoryStream(Paths.get(coll))) {
+
+		    for (final Path path : directoryStream) {
+			if (Files.isDirectory(path)) {
+			    indexDocs(writer, path);
+			}
+		    }
+
+		} catch (final IOException e) {
+		    e.printStackTrace();
+		    System.exit(-1);
+		}
+	    }
+
+	    writer.close();
+	} catch (IOException e) {
+	    System.out.println(" caught a " + e.getClass() + "\n with message: "
+		    + e.getMessage());
+	}
+    }
 
     public static void run(OpenMode openmode, String index, String coll)
 	    throws IOException {

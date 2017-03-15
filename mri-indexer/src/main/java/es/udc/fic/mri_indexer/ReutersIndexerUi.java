@@ -83,7 +83,7 @@ public class ReutersIndexerUi {
 		Indexer.run(openmode, index, coll);
 	    } else if (!colls.isEmpty()) {
 		CheckIndexOrDocumentDirectories.check_directories(colls, false);
-		// call to indexing function
+		Indexer.run(openmode, index, colls);
 	    } else {
 		print_usage_and_exit();
 	    }
