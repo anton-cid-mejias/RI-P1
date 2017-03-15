@@ -76,7 +76,9 @@ public class Indexer {
 		}
 	    });
 	} else {
-	    indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis());
+	    if (check_sgm(path)) {
+		indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis());
+	    }
 	}
     }
 
