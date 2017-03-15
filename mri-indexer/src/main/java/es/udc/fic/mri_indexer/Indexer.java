@@ -3,6 +3,7 @@ package es.udc.fic.mri_indexer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,7 +22,6 @@ import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
@@ -31,37 +31,13 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
+import examples.ThreadPoolExample.WorkerThread;
+
 public class Indexer {
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat(
-		"dd-MMM-yyyy HH:mm:ss.SS", Locale.US);
-    
-    public static void run(OpenMode openmode, String index, List<String> colls)
-	    throws IOException {
-	try {
-	    System.out.println("Indexing to directory '" + index + "'...");
+	    "dd-MMM-yyyy HH:mm:ss.SS", Locale.US);
 
-	    Directory dir = FSDirectory.open(Paths.get(index));
-	    Analyzer analyzer = new StandardAnalyzer();
-	    IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-
-	    iwc.setOpenMode(openmode);
-
-	    IndexWriter writer = new IndexWriter(dir, iwc);
-
-	    Path docDir = null;
-	    for (String docsPath : colls) {
-		docDir = Paths.get(docsPath);
-		indexDocs(writer, docDir);
-	    }
-
-	    writer.close();
-	} catch (IOException e) {
-	    System.out.println(" caught a " + e.getClass() + "\n with message: "
-		    + e.getMessage());
-	}
-    }
-    
     public static void run(OpenMode openmode, String index, String coll)
 	    throws IOException {
 	try {
@@ -74,9 +50,20 @@ public class Indexer {
 	    iwc.setOpenMode(openmode);
 
 	    IndexWriter writer = new IndexWriter(dir, iwc);
-	    
-	    Path docDir = Paths.get(coll);
-	    indexDocs(writer, docDir);
+
+	    try (DirectoryStream<Path> directoryStream = Files
+		    .newDirectoryStream(Paths.get(coll))) {
+
+		for (final Path path : directoryStream) {
+		    if (Files.isDirectory(path)) {
+			indexDocs(writer, path);
+		    }
+		}
+
+	    } catch (final IOException e) {
+		e.printStackTrace();
+		System.exit(-1);
+	    }
 
 	    writer.close();
 	} catch (IOException e) {
@@ -105,7 +92,8 @@ public class Indexer {
 	    });
 	} else {
 	    if (checkSgm(path)) {
-		indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis());
+		indexDoc(writer, path,
+			Files.getLastModifiedTime(path).toMillis());
 	    }
 	}
     }
@@ -126,7 +114,7 @@ public class Indexer {
 		// Order number in the document
 		Field seqDocNumberField = new IntPoint("SeqDocNumber", number);
 		doc.add(seqDocNumberField);
-		//doc.add(new StoredField("StoredSeqDocNumber", number));
+		// doc.add(new StoredField("StoredSeqDocNumber", number));
 		number++;
 		// TITLE of the reuter
 		Field title = new TextField("TITLE", reuter.get(0),
@@ -144,21 +132,22 @@ public class Indexer {
 		Field dateline = new TextField("DATELINE", reuter.get(3),
 			Field.Store.YES);
 		doc.add(dateline);
-		//DATE of the reuter
-		Field date = new StringField("DATE",
-			processDate(reuter.get(4)), Field.Store.YES);
+		// DATE of the reuter
+		Field date = new StringField("DATE", processDate(reuter.get(4)),
+			Field.Store.YES);
 		doc.add(date);
-		//Hostname who execute the thread
-		//Field hostname = new TextField("Hostname", ,
-		//	Field.Store.YES);
-		//doc.add(hostname);
-		//Thread executed
-		//Field thread = new TextField("thread", ,
-		//	Field.Store.YES);
-		//doc.add(thread);
-		
+		// Hostname who execute the thread
+		// Field hostname = new TextField("Hostname", ,
+		// Field.Store.YES);
+		// doc.add(hostname);
+		// Thread executed
+		// Field thread = new TextField("thread", ,
+		// Field.Store.YES);
+		// doc.add(thread);
+
 		if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
-		    System.out.println("adding " + file + " : REUTER " + (number-1));
+		    System.out.println(
+			    "adding " + file + " : REUTER " + (number - 1));
 		    writer.addDocument(doc);
 		} else {
 		    System.out.println("updating " + file);
@@ -183,7 +172,7 @@ public class Indexer {
 
     private static String processDate(String date) {
 	Date parsedDate = null;
-	
+
 	try {
 	    parsedDate = FORMAT.parse(date);
 	} catch (ParseException e) {
