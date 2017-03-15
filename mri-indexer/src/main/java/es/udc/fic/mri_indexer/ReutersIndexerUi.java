@@ -1,5 +1,6 @@
 package es.udc.fic.mri_indexer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
@@ -8,7 +9,7 @@ import es.udc.fic.util.CheckIndexOrDocumentDirectories;
 
 public class ReutersIndexerUi {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
 	if ((args.length == 0) || (args.length > 0
 		&& ("-h".equals(args[0]) || "-help".equals(args[0])))) {
@@ -27,8 +28,9 @@ public class ReutersIndexerUi {
 	    if ("-openmode".equals(args[i])) {
 		openmodeString = args[i + 1];
 		if ((!openmodeString.equals("append"))
-			|| (!openmodeString.equals("create"))
-			|| (!openmodeString.equals("append_or_create"))) {
+			&& (!openmodeString.equals("create"))
+			&& (!openmodeString.equals("append_or_create"))) {
+		    System.out.println(openmodeString);
 		    System.err.println(
 			    "Openmode must be: append, create or append_or_create.");
 		    System.exit(1);
@@ -78,7 +80,7 @@ public class ReutersIndexerUi {
 	    CheckIndexOrDocumentDirectories.check_directory(index, true);
 	    if (coll != null) {
 		CheckIndexOrDocumentDirectories.check_directory(coll, false);
-		// call to indexing function
+		Indexer.run(openmode, index, coll);
 	    } else if (!colls.isEmpty()) {
 		CheckIndexOrDocumentDirectories.check_directories(colls, false);
 		// call to indexing function

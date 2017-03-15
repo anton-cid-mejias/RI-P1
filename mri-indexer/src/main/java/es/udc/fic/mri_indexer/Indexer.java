@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -20,6 +21,7 @@ import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
@@ -31,6 +33,9 @@ import org.apache.lucene.store.FSDirectory;
 
 public class Indexer {
 
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat(
+		"dd-MMM-yyyy HH:mm:ss.SS", Locale.US);
+    
     public static void run(OpenMode openmode, String index, List<String> colls)
 	    throws IOException {
 	try {
@@ -49,6 +54,29 @@ public class Indexer {
 		docDir = Paths.get(docsPath);
 		indexDocs(writer, docDir);
 	    }
+
+	    writer.close();
+	} catch (IOException e) {
+	    System.out.println(" caught a " + e.getClass() + "\n with message: "
+		    + e.getMessage());
+	}
+    }
+    
+    public static void run(OpenMode openmode, String index, String coll)
+	    throws IOException {
+	try {
+	    System.out.println("Indexing to directory '" + index + "'...");
+
+	    Directory dir = FSDirectory.open(Paths.get(index));
+	    Analyzer analyzer = new StandardAnalyzer();
+	    IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+
+	    iwc.setOpenMode(openmode);
+
+	    IndexWriter writer = new IndexWriter(dir, iwc);
+	    
+	    Path docDir = Paths.get(coll);
+	    indexDocs(writer, docDir);
 
 	    writer.close();
 	} catch (IOException e) {
@@ -98,6 +126,7 @@ public class Indexer {
 		// Order number in the document
 		Field seqDocNumberField = new IntPoint("SeqDocNumber", number);
 		doc.add(seqDocNumberField);
+		//doc.add(new StoredField("StoredSeqDocNumber", number));
 		number++;
 		// TITLE of the reuter
 		Field title = new TextField("TITLE", reuter.get(0),
@@ -115,7 +144,7 @@ public class Indexer {
 		Field dateline = new TextField("DATELINE", reuter.get(3),
 			Field.Store.YES);
 		doc.add(dateline);
-		// DATE of the reuter
+		//DATE of the reuter
 		Field date = new StringField("DATE",
 			processDate(reuter.get(4)), Field.Store.YES);
 		doc.add(date);
@@ -129,11 +158,11 @@ public class Indexer {
 		//doc.add(thread);
 		
 		if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
-		    System.out.println("adding " + file);
+		    System.out.println("adding " + file + " : REUTER " + (number-1));
 		    writer.addDocument(doc);
 		} else {
 		    System.out.println("updating " + file);
-		    writer.updateDocument(new Term("path", file.toString()),
+		    writer.updateDocument(new Term("Pathsgm", file.toString()),
 			    doc);
 		}
 
@@ -154,10 +183,9 @@ public class Indexer {
 
     private static String processDate(String date) {
 	Date parsedDate = null;
-	SimpleDateFormat format = new SimpleDateFormat(
-		"dd-MMM-yyyy HH:mm:ss.SS");
+	
 	try {
-	    parsedDate = format.parse(date);
+	    parsedDate = FORMAT.parse(date);
 	} catch (ParseException e) {
 	    System.out.println("Date field was not correct");
 	    e.printStackTrace();
