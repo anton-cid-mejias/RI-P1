@@ -43,12 +43,12 @@ public class ReutersIndexerUi {
 		coll = args[i + 1];
 		i++;
 	    } else if ("-colls".equals(args[i])) {
-		while (!((args[i + 1]).charAt(0) == '-')) {
+		while ((i+1 < args.length) && !((args[i + 1]).charAt(0) == '-')) {
 		    colls.add(args[i + 1]);
 		    i++;
 		}
 	    } else if ("-indexes1".equals(args[i])) {
-		while (!((args[i + 1]).charAt(0) == '-')) {
+		while ((i+1 < args.length) && !((args[i + 1]).charAt(0) == '-')) {
 		    indexes1.add(args[i + 1]);
 		    i++;
 		}

@@ -38,19 +38,7 @@ public class Indexes1Threading {
 	    //InetAddress.getLocalHost().getHostName()
 
 
-	    try (DirectoryStream<Path> directoryStream = Files
-		    .newDirectoryStream(Paths.get(documentDirectory))) {
-
-		for (final Path path : directoryStream) {
-		    if (Files.isDirectory(path)) {
-			// do stuff
-		    }
-		}
-
-	    } catch (final IOException e) {
-		e.printStackTrace();
-		System.exit(-1);
-	    }
+	    //do stuff
 	}
     }
 
