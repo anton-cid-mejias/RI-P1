@@ -3,7 +3,7 @@ package es.udc.fic.mri_indexer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.DirectoryStream;
+import java.net.InetAddress;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,7 +26,6 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -50,19 +49,7 @@ public class Indexer {
 	    IndexWriter writer = new IndexWriter(dir, iwc);
 
 	    for (String coll : colls) {
-		try (DirectoryStream<Path> directoryStream = Files
-			.newDirectoryStream(Paths.get(coll))) {
-
-		    for (final Path path : directoryStream) {
-			if (Files.isDirectory(path)) {
-			    indexDocs(writer, path);
-			}
-		    }
-
-		} catch (final IOException e) {
-		    e.printStackTrace();
-		    System.exit(-1);
-		}
+		indexDocs(writer, Paths.get(coll));
 	    }
 
 	    writer.close();
@@ -85,19 +72,7 @@ public class Indexer {
 
 	    IndexWriter writer = new IndexWriter(dir, iwc);
 
-	    try (DirectoryStream<Path> directoryStream = Files
-		    .newDirectoryStream(Paths.get(coll))) {
-
-		for (final Path path : directoryStream) {
-		    if (Files.isDirectory(path)) {
-			indexDocs(writer, path);
-		    }
-		}
-
-	    } catch (final IOException e) {
-		e.printStackTrace();
-		System.exit(-1);
-	    }
+	    indexDocs(writer, Paths.get(coll));
 
 	    writer.close();
 	} catch (IOException e) {
@@ -171,23 +146,20 @@ public class Indexer {
 			Field.Store.YES);
 		doc.add(date);
 		// Hostname who execute the thread
-		// Field hostname = new TextField("Hostname", ,
-		// Field.Store.YES);
-		// doc.add(hostname);
+		// Thread.currentThread().getName())
+		// InetAddress.getLocalHost().getHostName()
+		Field hostname = new TextField("Hostname",
+			InetAddress.getLocalHost().getHostName(),
+			Field.Store.YES);
+		doc.add(hostname);
 		// Thread executed
-		// Field thread = new TextField("thread", ,
-		// Field.Store.YES);
-		// doc.add(thread);
+		Field thread = new TextField("Thread",
+			Thread.currentThread().getName(), Field.Store.YES);
+		doc.add(thread);
 
-		if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
-		    System.out.println(
-			    "adding " + file + " : REUTER " + (number - 1));
-		    writer.addDocument(doc);
-		} else {
-		    System.out.println("updating " + file);
-		    writer.updateDocument(new Term("Pathsgm", file.toString()),
-			    doc);
-		}
+		System.out.println(
+			"adding " + file + " : REUTER " + (number - 1));
+		writer.addDocument(doc);
 
 	    }
 	}

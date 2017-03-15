@@ -29,8 +29,7 @@ public class ReutersIndexerUi {
 		openmodeString = args[i + 1];
 		if ((!openmodeString.equals("append"))
 			&& (!openmodeString.equals("create"))
-			&& (!openmodeString.equals("append_or_create"))) {
-		    System.out.println(openmodeString);
+			&& (!openmodeString.equals("create_or_append"))) {
 		    System.err.println(
 			    "Openmode must be: append, create or append_or_create.");
 		    System.exit(1);
