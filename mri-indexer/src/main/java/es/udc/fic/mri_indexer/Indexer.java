@@ -65,7 +65,7 @@ public class Indexer {
 		public FileVisitResult visitFile(Path file,
 			BasicFileAttributes attrs) throws IOException {
 		    try {
-			if (check_sgm(file)) {
+			if (checkSgm(file)) {
 			    indexDoc(writer, file,
 				    attrs.lastModifiedTime().toMillis());
 			}
@@ -76,7 +76,9 @@ public class Indexer {
 		}
 	    });
 	} else {
-	    indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis());
+	    if (checkSgm(path)) {
+		indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis());
+	    }
 	}
     }
 
@@ -117,7 +119,15 @@ public class Indexer {
 		Field date = new StringField("DATE",
 			processDate(reuter.get(4)), Field.Store.YES);
 		doc.add(date);
-
+		//Hostname who execute the thread
+		//Field hostname = new TextField("Hostname", ,
+		//	Field.Store.YES);
+		//doc.add(hostname);
+		//Thread executed
+		//Field thread = new TextField("thread", ,
+		//	Field.Store.YES);
+		//doc.add(thread);
+		
 		if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
 		    System.out.println("adding " + file);
 		    writer.addDocument(doc);
@@ -157,7 +167,7 @@ public class Indexer {
 	return luceneDateString;
     }
 
-    private static boolean check_sgm(Path file) {
+    private static boolean checkSgm(Path file) {
 	// reut2-xxx.sgm? de momento acepta cualquier .sgm
 
 	String extension = "";
