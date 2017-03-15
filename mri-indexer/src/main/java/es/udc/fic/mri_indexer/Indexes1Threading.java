@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import examples.ThreadPoolExample.WorkerThread;
 
-public class ThreadsMaster {
+public class Indexes1Threading {
 
     // en el thread que queda pon Hostname y Thread
 
@@ -52,7 +52,7 @@ public class ThreadsMaster {
 
     }
 
-    public static void indexes1(String[] colls, String[] indexes) {
+    public static void startThreads(String[] colls, String[] indexes) {
 	final String finalIndex = indexes[0];
 	// Removing first index, that way colls and indexes are directly
 	// corresponding
