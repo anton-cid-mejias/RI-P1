@@ -143,14 +143,12 @@ public class Indexer {
 			Field.Store.YES);
 		doc.add(date);
 		// Hostname who execute the thread
-		// Thread.currentThread().getName())
-		// InetAddress.getLocalHost().getHostName()
-		Field hostname = new TextField("Hostname",
+		Field hostname = new StringField("Hostname",
 			InetAddress.getLocalHost().getHostName(),
 			Field.Store.YES);
 		doc.add(hostname);
 		// Thread executed
-		Field thread = new TextField("Thread",
+		Field thread = new StringField("Thread",
 			Thread.currentThread().getName(), Field.Store.YES);
 		doc.add(thread);
 
