@@ -16,7 +16,7 @@ import org.apache.lucene.store.FSDirectory;
 
 public class Indexes2Threading {
 
-    private static class WorkerThread implements Runnable {
+    private static class WorkerThread implements Runnable { 
 
 	private final String documentDirectory;
 	private final IndexWriter writer;
@@ -28,13 +28,19 @@ public class Indexes2Threading {
 
 	@Override
 	public void run() {
-
-	    // USA EL WRITER PARA CADA COSA
+	    try {
+		Indexer.indexDocs(writer, Paths.get(documentDirectory));
+	    } catch (IOException e) {
+		e.printStackTrace();
+		System.exit(-1);
+	    }
 	}
 
     }
 
-    public static void startThreads(OpenMode openmode, List<String> colls, String index) {
+    public static void startThreads(OpenMode openmode, String index, List<String> colls) {
+	//Time measurement
+	long startTime = System.nanoTime();
 
 	final ExecutorService executor = Executors
 		.newFixedThreadPool(colls.size());
@@ -64,5 +70,7 @@ public class Indexes2Threading {
 	    e1.printStackTrace();
 	    System.exit(-1);
 	}
+	
+	System.out.println(String.format("Total time of threading: %s nanoseconds", (System.nanoTime() - startTime)));
     }
 }

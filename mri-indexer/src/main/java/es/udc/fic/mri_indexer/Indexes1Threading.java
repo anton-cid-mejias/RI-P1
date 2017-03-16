@@ -16,7 +16,7 @@ import org.apache.lucene.store.FSDirectory;
 
 public class Indexes1Threading {
 
-    private static class WorkerThread implements Runnable {
+    private static class WorkerThread implements Runnable { 
 
 	private final OpenMode openmode;
 	private final String documentDirectory;
@@ -42,6 +42,9 @@ public class Indexes1Threading {
 
     public static void startThreads(OpenMode openmode, List<String> indexes,
 	    List<String> colls) {
+	//Time measurement
+	long startTime = System.nanoTime();
+	
 	final String finalIndex = indexes.get(0);
 	// Removing first index, that way colls and indexes are directly
 	// corresponding
@@ -72,6 +75,8 @@ public class Indexes1Threading {
 	    e.printStackTrace();
 	    System.exit(-1);
 	}
+	
+	System.out.println(String.format("Total time of threading: %s nanoseconds", (System.nanoTime() - startTime)));
 	
     }
 
