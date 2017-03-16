@@ -9,7 +9,7 @@ import es.udc.fic.util.CheckIndexOrDocumentDirectories;
 
 public class ReutersIndexerUi {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException { 
 
 	if ((args.length == 0) || (args.length > 0
 		&& ("-h".equals(args[0]) || "-help".equals(args[0])))) {
@@ -104,7 +104,7 @@ public class ReutersIndexerUi {
 	    CheckIndexOrDocumentDirectories.check_directory(indexes2, true);
 	    if (!colls.isEmpty()) {
 		CheckIndexOrDocumentDirectories.check_directories(colls, false);
-		// call to indexing function
+		Indexes2Threading.startThreads(openmode, indexes2, colls);
 	    } else {
 		print_usage_and_exit();
 	    }

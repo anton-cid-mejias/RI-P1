@@ -78,7 +78,8 @@ public class Indexer {
 	}
     }
 
-    private static void indexDocs(final IndexWriter writer, Path path)
+    //This method is public for Indexes2 to use
+    public static void indexDocs(final IndexWriter writer, Path path)
 	    throws IOException {
 	if (Files.isDirectory(path)) {
 	    Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
