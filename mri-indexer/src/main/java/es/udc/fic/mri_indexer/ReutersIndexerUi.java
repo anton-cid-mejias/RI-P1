@@ -95,7 +95,7 @@ public class ReutersIndexerUi {
 		    System.exit(1);
 		}
 		CheckIndexOrDocumentDirectories.check_directories(colls, false);
-		// call to indexing function
+		Indexes1Threading.startThreads(openmode, indexes1, colls);
 	    } else {
 		print_usage_and_exit();
 	    }

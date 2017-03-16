@@ -1,11 +1,8 @@
 package es.udc.fic.mri_indexer;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -13,12 +10,11 @@ import java.util.concurrent.TimeUnit;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 public class Indexes2Threading {
-
-    // en el thread que queda pon Hostname y Thread
 
     private static class WorkerThread implements Runnable {
 
@@ -32,32 +28,30 @@ public class Indexes2Threading {
 
 	@Override
 	public void run() {
-	    //Thread.currentThread().getName())     es un string
-	    //InetAddress.getLocalHost().getHostName()   tb es un string
 
 	    // USA EL WRITER PARA CADA COSA
 	}
 
     }
 
-    public static void startThreads(String[] colls, String index) {
-	int numThreads = colls.length;
+    public static void startThreads(OpenMode openmode, List<String> colls, String index) {
 
 	final ExecutorService executor = Executors
-		.newFixedThreadPool(numThreads);
+		.newFixedThreadPool(colls.size());
 	Directory dir;
 	try {
 	    dir = FSDirectory.open(Paths.get(index));
 	    IndexWriterConfig iwc = new IndexWriterConfig(
 		    new StandardAnalyzer());
+	    iwc.setOpenMode(openmode);
 	    IndexWriter writer = new IndexWriter(dir, iwc);
 
-	    for (int i = 0; i < numThreads; i++) {
-		final Runnable worker = new WorkerThread(colls[i], writer);
+	    for (String coll : colls) {
+		final Runnable worker = new WorkerThread(coll, writer);
 		executor.execute(worker);
 	    }
-	    executor.shutdown();
 
+	    executor.shutdown();
 	    try {
 		executor.awaitTermination(1, TimeUnit.HOURS);
 	    } catch (final InterruptedException e) {
