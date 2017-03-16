@@ -32,9 +32,6 @@ import org.apache.lucene.store.FSDirectory;
 
 public class Indexer {
 
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat(
-	    "dd-MMM-yyyy HH:mm:ss.SS", Locale.US);
-
     public static void run(OpenMode openmode, String index, List<String> colls)
 	    throws IOException {
 	try {
@@ -178,9 +175,11 @@ public class Indexer {
 
     private static String processDate(String date) {
 	Date parsedDate = null;
+	final SimpleDateFormat format = new SimpleDateFormat(
+		    "dd-MMM-yyyy HH:mm:ss.SS", Locale.US);
 
 	try {
-	    parsedDate = FORMAT.parse(date);
+	    parsedDate = format.parse(date);
 	} catch (ParseException e) {
 	    System.out.println("Date field was not correct");
 	    e.printStackTrace();
