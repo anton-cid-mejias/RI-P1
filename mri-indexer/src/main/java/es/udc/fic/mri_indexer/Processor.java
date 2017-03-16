@@ -50,11 +50,7 @@ public class Processor {
 	printIdfTerms(listTerms,n,asc);
     }
 
-    public static void bestTfIdfTerms(String indexFile, String field, int n) {
-
-    }
-
-    public static void poorTfIdfTerms(String indexFile, String field, int n) {
+    public static void TfIdfTerms(String indexFile, String field, int n) {
 
     }
     
