@@ -61,11 +61,9 @@ public class Processor {
 	Map<String, Integer> termDocMap = new HashMap<>();
 
 	termMap = getTermFrequencies(indexReader, field);
-
+	indexReader = DirectoryReader.open(dir);
+	
 	for (int i = 0; i < numberDocuments; i++) {
-	    
-	    indexReader = DirectoryReader.open(dir);
-
 	    
 	    termDocMap = getTermDocFrequencies(indexReader, i, field);
 	    
