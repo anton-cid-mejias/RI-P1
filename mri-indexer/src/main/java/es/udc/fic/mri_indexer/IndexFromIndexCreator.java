@@ -46,7 +46,7 @@ public class IndexFromIndexCreator {
 
     public static void deldocsQuery(String indexin, String indexout,
 	    String queryString) {
-	QueryParser parser = new QueryParser(queryString,
+	QueryParser parser = new QueryParser("TITLE",
 		new StandardAnalyzer());
 
 	try {

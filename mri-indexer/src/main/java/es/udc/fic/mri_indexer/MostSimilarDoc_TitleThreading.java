@@ -15,6 +15,9 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -39,19 +42,26 @@ public class MostSimilarDoc_TitleThreading {
 	@Override
 	public void run() {
 	    Document doc = null;
+	    String queryString = null;
+	    Query query = null;
+	    QueryParser parser = new QueryParser("TITLE",
+			new StandardAnalyzer());
 	    try {
 		for (int i = initialDoc; i < finalDoc; i++) {
 		    doc = reader.document(i);
+		    queryString = "TITLE:" + "'" + doc.get("TITLE") +"'"
+			    + "AND BODY:" + "'" + doc.get("TITLE") +"'";
+		    query = parser.parse(queryString);
 		    
 		    
 		    /*
 		    Field SimPathSgmField = new StringField("SimPathSgm", file.toString(),
 			    Field.Store.YES);
-		    doc.add(simPathSgmField);
+		    doc.add(SimPathSgmField);
 		    */
 		    
 		}
-	    } catch (IOException e) {
+	    } catch (IOException | ParseException e) {
 		e.printStackTrace();
 		System.exit(-1);
 	    }
