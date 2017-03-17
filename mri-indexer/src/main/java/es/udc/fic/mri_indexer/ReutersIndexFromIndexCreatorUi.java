@@ -9,7 +9,7 @@ public class ReutersIndexFromIndexCreatorUi {
 		&& ("-h".equals(args[0]) || "-help".equals(args[0])))) {
 	    print_usage_and_exit();
 	}
-	
+
 	String indexin = null;
 	String indexout = null;
 	String deldocsField = null;
@@ -18,66 +18,67 @@ public class ReutersIndexFromIndexCreatorUi {
 	Integer title_threads = null;
 	Integer n_best_terms = null;
 	Integer body_threads = null;
-	//We don't allow the use of more than one option, except for indexin/out
+	// We don't allow the use of more than one option, except for
+	// indexin/out
 	Integer option_number = 0;
-	
-	//Parsing
+
+	// Parsing
 	for (int i = 0; i < args.length; i++) {
 	    if ("-indexin".equals(args[i])) {
-		indexin = args[i+1];
+		indexin = args[i + 1];
 		i++;
-	    }else if ("-indexout".equals(args[i])){
-		indexout = args[i+1];
+	    } else if ("-indexout".equals(args[i])) {
+		indexout = args[i + 1];
 		i++;
-	    }else if ("-deldocsterm".equals(args[i])){
-		deldocsField = args[i+1];
-		deldocsTerm = args[i+2];
-		i = i+2;
-		option_number ++;
-	    }else if("-deldocsquery".equals(args[i])){
-		query = args[i+1];
-		i++; i++;
-		option_number ++;
-	    }else if ("-mostsimilardoc_title".equals(args[i])){
-		title_threads = Integer.parseInt(args[i+1]);
+	    } else if ("-deldocsterm".equals(args[i])) {
+		deldocsField = args[i + 1];
+		deldocsTerm = args[i + 2];
+		i = i + 2;
+		option_number++;
+	    } else if ("-deldocsquery".equals(args[i])) {
+		query = args[i + 1];
 		i++;
-		option_number ++;
-	    }else if ("-mostsimilardoc_body".equals(args[i])){
-		n_best_terms = Integer.parseInt(args[i+1]);
-		body_threads = Integer.parseInt(args[i+2]);
-		i = i+2;
-		option_number ++;
+		i++;
+		option_number++;
+	    } else if ("-mostsimilardoc_title".equals(args[i])) {
+		title_threads = Integer.parseInt(args[i + 1]);
+		i++;
+		option_number++;
+	    } else if ("-mostsimilardoc_body".equals(args[i])) {
+		n_best_terms = Integer.parseInt(args[i + 1]);
+		body_threads = Integer.parseInt(args[i + 2]);
+		i = i + 2;
+		option_number++;
 	    }
 	}
-	
 
-	//Option choosing
-	if ((option_number !=1) || (indexin == null)){
+	// Option choosing
+	if ((option_number != 1) || (indexin == null)) {
 	    print_usage_and_exit();
-	} else if (indexout == null){
-	    if (deldocsField != null){
-		CheckIndexOrDocumentDirectories.check_directory(indexin, false);
-		CheckIndexOrDocumentDirectories.check_directory(indexin, true);
-		//call to function, haciendo que indexout = indexin
-	    } else if (query != null){
-		CheckIndexOrDocumentDirectories.check_directory(indexin, false);
-		CheckIndexOrDocumentDirectories.check_directory(indexin, true);
-		//call to function, haciendo que indexout = indexin
+	} else if (indexout == null) {
+	    CheckIndexOrDocumentDirectories.check_directory(indexin, false);
+	    CheckIndexOrDocumentDirectories.check_directory(indexin, true);
+	    if (deldocsTerm != null) {
+		IndexFromIndexCreator.deldocsTerm(indexin, indexout,
+			deldocsField, deldocsTerm);
+	    } else if (query != null) {
+		IndexFromIndexCreator.deldocsQuery(indexin, indexout, query);
 	    } else {
 		print_usage_and_exit();
 	    }
 
-	}else if (indexout != null){
+	} else if (indexout != null) {
 	    CheckIndexOrDocumentDirectories.check_directory(indexin, false);
 	    CheckIndexOrDocumentDirectories.check_directory(indexout, true);
-	    if (deldocsField != null){
-		//call to function
-	    } else if (query != null){
-		//call to function
-	    } else if (title_threads != null){
-		//call to function
-	    } else if (body_threads != null){
-		//call to function
+	    if (deldocsTerm != null) {
+		IndexFromIndexCreator.deldocsTerm(indexin, indexout,
+			deldocsField, deldocsTerm);
+	    } else if (query != null) {
+		IndexFromIndexCreator.deldocsQuery(indexin, indexout, query);
+	    } else if (title_threads != null) {
+		// call to function
+	    } else if (body_threads != null) {
+		// call to function
 	    }
 	}
 
