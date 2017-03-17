@@ -5,7 +5,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.Fields;
@@ -28,7 +31,8 @@ public class Processor {
 	indexReader = DirectoryReader.open(dir);
 	int numberDocuments = indexReader.numDocs();
 	List<TermIdf> listTerms = new ArrayList<>();
-
+	Map<String,Integer> termMap = new HashMap<>();
+	
 	for (final LeafReaderContext leaf : indexReader.leaves()) {
 	    try (LeafReader leafReader = leaf.reader()) {
 
@@ -40,24 +44,37 @@ public class Processor {
 		while (termsEnum.next() != null) {
 			final String tt = termsEnum.term().utf8ToString();
 			final int f = termsEnum.docFreq();
-			final double idf= Math.log(numberDocuments/f);
-			
-			listTerms.add(new TermIdf(tt,idf));
-
+			if (termMap.containsKey(tt)){
+			    int lastF = termMap.get(tt);
+			    termMap.put(tt, (lastF+f));
+			}else{
+			    termMap.put(tt,f);
+			}
 		}
+		
 	    }
+	    
 	 }
-	printIdfTerms(listTerms,n,asc);
+	@SuppressWarnings("rawtypes")
+	Iterator it = termMap.entrySet().iterator();
+	while (it.hasNext()) {
+	    @SuppressWarnings("rawtypes")
+	    Map.Entry pair = (Map.Entry)it.next();
+	    final double idf= Math.log((float) numberDocuments/((int) pair.getValue()));
+	    listTerms.add(new TermIdf((String)pair.getKey(),idf));
+	}
+	printIdfTerms(listTerms,n,field,asc);
     }
 
     public static void TfIdfTerms(String indexFile, String field, int n) {
 
     }
     
-    private static void printIdfTerms(List<TermIdf> list, int n, boolean asc){
+    private static void printIdfTerms(List<TermIdf> list, int n,String field, boolean asc){
 	
 	if (asc){
 	    Collections.sort(list);
+	    System.out.println("\nBest_idf of " + field + ":");
 	}else{
 	    Collections.sort(list,new Comparator<TermIdf>() {
 		    @Override
@@ -65,12 +82,14 @@ public class Processor {
 		        return b.compareTo(a);
 		    }
 		});
+	    System.out.println("\nPoor_idf of " + field + ":");
 	}
 	
 	int size = list.size();
 	if (n>size){
 	    n = size;
 	}
+	
 	
 	for (int i=0; i < n ; i++){
 	    System.out.println("Nº=" +(i+1)+ "	" + list.get(i).toString());

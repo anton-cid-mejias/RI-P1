@@ -79,8 +79,8 @@ public class SimpleReader3 {
 				final Fields fields = leafReader.fields();
 				System.out.println("Numero de campos devuelto por leafReader.fields() = " + fields.size());
 
-				for (final String field : fields) {
-
+				//for ( String field : fields) {
+				    	String field = "BODY";
 					System.out.println("Field = " + field);
 					final Terms terms = fields.terms(field);
 					final TermsEnum termsEnum = terms.iterator();
@@ -89,23 +89,24 @@ public class SimpleReader3 {
 						final String tt = termsEnum.term().utf8ToString();
 						// totalFreq equals -1 if the value was not
 						// stored in the codification of this index
+						if (tt.equals	("3")){
 						System.out.println("\t" + tt + "\ttotalFreq()=" + termsEnum.totalTermFreq() + "\tdocFreq="
 								+ termsEnum.docFreq());
-
+						}
 					}
 
-				}
+				//}
 
 				int doc;
 				final Term term = new Term("modelDescription", "probability");
 				final PostingsEnum postingsEnum = leafReader.postings(term);
 
-				while ((doc = postingsEnum.nextDoc()) != PostingsEnum.NO_MORE_DOCS) {
+				/*while ((doc = postingsEnum.nextDoc()) != PostingsEnum.NO_MORE_DOCS) {
 					System.out.println(
 							"\nTerm(field=modelDescription, text=probability)" + " appears in doc num: " + doc);
 					final Document d = leafReader.document(doc);
 					System.out.println("modelDescription = " + d.get("modelDescription"));
-				}
+				}*/
 
 			}
 		}
