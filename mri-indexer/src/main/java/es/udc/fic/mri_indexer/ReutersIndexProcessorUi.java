@@ -72,10 +72,18 @@ public class ReutersIndexProcessorUi {
 	    }
 	}
 	if (best_tf){
-	    
+	    try {
+		Processor.TfIdfTerms(indexfile, field[2], n[2], true);
+	    } catch (IOException e) {
+		e.printStackTrace();
+	    }
 	}
 	if (poor_tf){
-	    
+	    try {
+		Processor.TfIdfTerms(indexfile, field[3], n[3], false);
+	    } catch (IOException e) {
+		e.printStackTrace();
+	    }
 	}
 
     }
