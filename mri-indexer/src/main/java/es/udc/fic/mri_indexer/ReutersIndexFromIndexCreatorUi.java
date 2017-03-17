@@ -14,10 +14,14 @@ public class ReutersIndexFromIndexCreatorUi {
 	String indexout = null;
 	String deldocsField = null;
 	String deldocsTerm = null;
-	String title = null;
-	String body = null;
-	Integer n = null;
+	String query = null;
+	Integer title_threads = null;
+	Integer n_best_terms = null;
+	Integer body_threads = null;
+	//We don't allow the use of more than one option, except for indexin/out
+	Integer option_number = 0;
 	
+	//Parsing
 	for (int i = 0; i < args.length; i++) {
 	    if ("-indexin".equals(args[i])) {
 		indexin = args[i+1];
@@ -29,30 +33,53 @@ public class ReutersIndexFromIndexCreatorUi {
 		deldocsField = args[i+1];
 		deldocsTerm = args[i+2];
 		i = i+2;
+		option_number ++;
 	    }else if("-deldocsquery".equals(args[i])){
-		//NO sé aún como vamos a pasar la query
-	
-	    }else if ("-mostsimilardoc_title".equals(args[i])){ //debe ser concurrente
-		title = args[i+1];
+		query = args[i+1];
+		i++; i++;
+		option_number ++;
+	    }else if ("-mostsimilardoc_title".equals(args[i])){
+		title_threads = Integer.parseInt(args[i+1]);
 		i++;
-	    }else if ("-mostsimilardoc_body".equals(args[i])){ //debe ser concurrente
-		n = Integer.parseInt(args[i+1]);
-		body = args[i+2];
+		option_number ++;
+	    }else if ("-mostsimilardoc_body".equals(args[i])){
+		n_best_terms = Integer.parseInt(args[i+1]);
+		body_threads = Integer.parseInt(args[i+2]);
 		i = i+2;
+		option_number ++;
 	    }
-	    
 	}
 	
-	
-	//OJO, si se hace deldocsterm o query no hace falta comprobr indexout, 
-	//se aplica sobre indexin
-	if (indexin == null || indexout == null){
+
+	//Option choosing
+	if ((option_number !=1) || (indexin == null)){
 	    print_usage_and_exit();
+	} else if (indexout == null){
+	    if (deldocsField != null){
+		CheckIndexOrDocumentDirectories.check_directory(indexin, false);
+		CheckIndexOrDocumentDirectories.check_directory(indexin, true);
+		//call to function, haciendo que indexout = indexin
+	    } else if (query != null){
+		CheckIndexOrDocumentDirectories.check_directory(indexin, false);
+		CheckIndexOrDocumentDirectories.check_directory(indexin, true);
+		//call to function, haciendo que indexout = indexin
+	    } else {
+		print_usage_and_exit();
+	    }
+
+	}else if (indexout != null){
+	    CheckIndexOrDocumentDirectories.check_directory(indexin, false);
+	    CheckIndexOrDocumentDirectories.check_directory(indexout, true);
+	    if (deldocsField != null){
+		//call to function
+	    } else if (query != null){
+		//call to function
+	    } else if (title_threads != null){
+		//call to function
+	    } else if (body_threads != null){
+		//call to function
+	    }
 	}
-	CheckIndexOrDocumentDirectories.check_directory(indexin, false);
-	CheckIndexOrDocumentDirectories.check_directory(indexout, true);
-	
-	//sin acabar, no sé si puede hacer varias peticiones a la vez o no
 
     }
 
