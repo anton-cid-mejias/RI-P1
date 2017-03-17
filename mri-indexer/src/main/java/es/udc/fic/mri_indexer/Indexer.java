@@ -115,7 +115,7 @@ public class Indexer {
 	    for (List<String> reuter : reuters) {
 		Document doc = new Document();
 		// Path of the file indexed
-		Field pathsgmField = new StringField("Pathsgm", file.toString(),
+		Field pathsgmField = new StringField("PathSgm", file.toString(),
 			Field.Store.YES);
 		doc.add(pathsgmField);
 		// Order number in the document
