@@ -1,14 +1,14 @@
 package es.udc.fic.mri_indexer;
 
-public class TermTfIdf implements Comparable<TermTfIdf>{
-    
+public class TermTfIdf implements Comparable<TermTfIdf> {
+
     private final Double tfIdf;
-    private final Integer tf;
+    private final Double tf;
     private final Double idf;
     private final String term;
     private final Integer docId;
-    
-    TermTfIdf(String term,int docId, double idf, int tf, double tfIdf){
+
+    TermTfIdf(String term, int docId, double idf, double tf, double tfIdf) {
 	this.idf = idf;
 	this.term = term;
 	this.tf = tf;
@@ -17,32 +17,31 @@ public class TermTfIdf implements Comparable<TermTfIdf>{
     }
 
     public Double getTfIdf() {
-        return tfIdf;
+	return tfIdf;
     }
 
-    public Integer getTf() {
-        return tf;
+    public Double getTf() {
+	return tf;
     }
 
     public Double getIdf() {
-        return idf;
+	return idf;
     }
 
     public String getTerm() {
-        return term;
+	return term;
     }
 
     @Override
     public int compareTo(TermTfIdf o) {
-	int lastCmp = idf.compareTo(o.getTfIdf());
+	int lastCmp = tfIdf.compareTo(o.getTfIdf());
 	return (lastCmp != 0 ? lastCmp : term.compareTo(o.getTerm()));
     }
 
-    
     @Override
     public String toString() {
-	return "tfIdf=" + tfIdf + " tf=" + tf + " idf=" + idf
-		+ " term=" + term + " docId=" + docId;
+	return "	term=" + term + "	docId=" + docId + "	tfIdf="
+		+ tfIdf + "	tf=" + tf + "	idf=" + idf;
     }
 
     @Override

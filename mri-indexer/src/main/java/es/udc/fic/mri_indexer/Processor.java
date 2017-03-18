@@ -15,9 +15,10 @@ import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.PostingsEnum;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -56,32 +57,16 @@ public class Processor {
 
 	dir = FSDirectory.open(Paths.get(indexFile));
 	indexReader = DirectoryReader.open(dir);
-	int numberDocuments = indexReader.numDocs();
 	List<TermTfIdf> listTerms = new ArrayList<>();
 	Map<String, Integer> termMap = new HashMap<>();
-	Map<String, Integer> termDocMap = new HashMap<>();
 
 	termMap = getTermFrequencies(indexReader, field);
-	
+
 	dir = FSDirectory.open(Paths.get(indexFile));
 	indexReader = DirectoryReader.open(dir);
-	
-	for (int i = 0; i < numberDocuments; i++) {
-	    
-	    termDocMap = getTermDocFrequencies(indexReader, i, field);
-	    
-	    @SuppressWarnings("rawtypes")
-	    Iterator it = termMap.entrySet().iterator();
-	    while (it.hasNext()) {
-		@SuppressWarnings("rawtypes")
-		Map.Entry pair = (Map.Entry) it.next();
-		final double idf = Math
-			.log((float) numberDocuments / ((int) pair.getValue()));
-		String termName = (String) pair.getKey();
-		final int tf = termDocMap.get(termName);
-		listTerms.add(new TermTfIdf(termName,i,idf,tf,(tf*idf)));
-	    }
-	}
+
+	listTerms = getListTfIdfTerms(indexReader, field, termMap);
+
 	printTfIdfTerms(listTerms, n, field, asc);
     }
 
@@ -115,37 +100,72 @@ public class Processor {
 	return termMap;
     }
 
-    private static Map<String, Integer> getTermDocFrequencies(
-	    IndexReader reader, int docId, String field) throws IOException {
-	Terms vector = reader.getTermVector(docId, field);
+    private static List<TermTfIdf> getListTfIdfTerms(IndexReader indexReader,
+	    String field, Map<String, Integer> termMap) throws IOException {
 
-	System.out.println(docId + field);
-	TermsEnum termsEnum = null;
-	System.out.println(vector.getSumDocFreq());
-	termsEnum = vector.iterator();
-	Map<String, Integer> frequencies = new HashMap<>();
+	int numberDocuments = indexReader.numDocs();
+	List<TermTfIdf> listTerms = new ArrayList<>();
 
-	while (termsEnum.next() != null) {
-	    String term = termsEnum.term().utf8ToString();
-	    int freq = (int) termsEnum.totalTermFreq();
-	    frequencies.put(term, freq);
+	for (final LeafReaderContext leaf : indexReader.leaves()) {
+	    try (LeafReader leafReader = leaf.reader()) {
+		@SuppressWarnings("rawtypes")
+		Iterator it = termMap.entrySet().iterator();
+
+		while (it.hasNext()) {
+		    @SuppressWarnings("rawtypes")
+		    Map.Entry pair = (Map.Entry) it.next();
+		    final double idf = Math.log(
+			    (float) numberDocuments / ((int) pair.getValue()));
+		    String termValue = (String) pair.getKey();
+		    final Term term = new Term(field, termValue);
+		    final PostingsEnum postingsEnum = leafReader.postings(term);
+
+		    if (postingsEnum != null) {
+			while ((postingsEnum
+				.nextDoc()) != PostingsEnum.NO_MORE_DOCS) {
+
+			    double tf = postingsEnum.freq();
+			    if (tf>=1){
+				tf = 1 + Math.log(tf);
+			    }
+			    listTerms.add(new TermTfIdf(termValue,
+				    postingsEnum.docID(), idf, tf, (tf * idf)));
+
+			}
+		    }
+		}
+	    }
+
 	}
-	return frequencies;
+	return listTerms;
     }
+    /*
+     * private static Map<String, Integer> getTermDocFrequencies( IndexReader
+     * reader, int docId, String field) throws IOException { Terms vector =
+     * reader.getTermVector(docId, field);
+     * 
+     * TermsEnum termsEnum = null; termsEnum = vector.iterator(); Map<String,
+     * Integer> frequencies = new HashMap<>();
+     * 
+     * while (termsEnum.next() != null) { String term =
+     * termsEnum.term().utf8ToString(); int freq = (int)
+     * termsEnum.totalTermFreq(); frequencies.put(term, freq); } return
+     * frequencies; }
+     */
 
     private static void printIdfTerms(List<TermIdf> list, int n, String field,
 	    boolean asc) {
 
 	if (asc) {
-	    Collections.sort(list);
-	    System.out.println("\nBest_idf of " + field + ":");
-	} else {
 	    Collections.sort(list, new Comparator<TermIdf>() {
 		@Override
 		public int compare(TermIdf a, TermIdf b) {
 		    return b.compareTo(a);
 		}
 	    });
+	    System.out.println("\nBest_idf of " + field + ":");
+	} else {
+	    Collections.sort(list);
 	    System.out.println("\nPoor_idf of " + field + ":");
 	}
 
@@ -160,20 +180,20 @@ public class Processor {
 	}
 
     }
-    
-    private static void printTfIdfTerms(List<TermTfIdf> list, int n, String field,
-	    boolean asc) {
+
+    private static void printTfIdfTerms(List<TermTfIdf> list, int n,
+	    String field, boolean asc) {
 
 	if (asc) {
-	    Collections.sort(list);
-	    System.out.println("\nBest_tfidf of " + field + ":");
-	} else {
 	    Collections.sort(list, new Comparator<TermTfIdf>() {
 		@Override
 		public int compare(TermTfIdf a, TermTfIdf b) {
 		    return b.compareTo(a);
 		}
 	    });
+	    System.out.println("\nBest_tfidf of " + field + ":");
+	} else {
+	    Collections.sort(list);
 	    System.out.println("\nPoor_tfidf of " + field + ":");
 	}
 
