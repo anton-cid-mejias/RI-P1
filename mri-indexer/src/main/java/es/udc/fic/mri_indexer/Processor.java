@@ -17,6 +17,7 @@ import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -61,6 +62,8 @@ public class Processor {
 	Map<String, Integer> termDocMap = new HashMap<>();
 
 	termMap = getTermFrequencies(indexReader, field);
+	
+	dir = FSDirectory.open(Paths.get(indexFile));
 	indexReader = DirectoryReader.open(dir);
 	
 	for (int i = 0; i < numberDocuments; i++) {
@@ -118,6 +121,7 @@ public class Processor {
 
 	System.out.println(docId + field);
 	TermsEnum termsEnum = null;
+	System.out.println(vector.getSumDocFreq());
 	termsEnum = vector.iterator();
 	Map<String, Integer> frequencies = new HashMap<>();
 
