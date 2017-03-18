@@ -116,6 +116,7 @@ public class Processor {
 	    IndexReader reader, int docId, String field) throws IOException {
 	Terms vector = reader.getTermVector(docId, field);
 
+	System.out.println(docId + field);
 	TermsEnum termsEnum = null;
 	termsEnum = vector.iterator();
 	Map<String, Integer> frequencies = new HashMap<>();

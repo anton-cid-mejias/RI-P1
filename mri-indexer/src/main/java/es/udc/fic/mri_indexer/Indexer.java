@@ -80,7 +80,7 @@ public class Indexer {
 	}
     }
 
-    //This method is public for Indexes2 to use
+    // This method is public for Indexes2 to use
     public static void indexDocs(final IndexWriter writer, Path path)
 	    throws IOException {
 	if (Files.isDirectory(path)) {
@@ -113,80 +113,75 @@ public class Indexer {
 	    List<List<String>> reuters = Reuters21578Parser
 		    .parseString(new StringBuffer(toString(stream)));
 
+	    FieldType t1 = new FieldType();
+	    t1.setIndexOptions(IndexOptions.DOCS_AND_FREQS);
+	    t1.setTokenized(true);
+	    t1.setStored(true);
+	    t1.setStoreTermVectors(true);
+	    t1.freeze();
+
+	    FieldType t2 = new FieldType();
+	    t2.setStored(true);
+	    t2.setStoreTermVectors(true);
+	    t2.setIndexOptions(IndexOptions.DOCS_AND_FREQS);
+	    t2.freeze();
+
 	    int number = 1;
 	    for (List<String> reuter : reuters) {
 		Document doc = new Document();
-		
-		FieldType t1 = new FieldType();
-		t1.setTokenized(true);
-		t1.setStored(true);
-		t1.setOmitNorms(true);
-		t1.setStoreTermVectors(true);
-		t1.setIndexOptions(IndexOptions.DOCS_AND_FREQS);
-		t1.freeze();
-		
-		FieldType t2 = new FieldType();
-		t2.setOmitNorms(true);
-		t2.setStored(true);
-		t2.setStoreTermVectors(true);
-		t2.setIndexOptions(IndexOptions.DOCS_AND_FREQS);
-		t2.freeze();
-		
+
 		// Path of the file indexed
-		//Field pathsgmField = new StringField("PathSgm", file.toString(),
-		//	Field.Store.YES);
-		Field pathsgmField = new Field("PathSgm", file.toString(),t1);
+		// Field pathsgmField = new StringField("PathSgm",
+		// file.toString(),
+		// Field.Store.YES);
+		Field pathsgmField = new Field("PathSgm", file.toString(), t1);
 		doc.add(pathsgmField);
 		// Order number in the document
-		//Field seqDocNumberField = new IntPoint("SeqDocNumber", number);
-		//doc.add(seqDocNumberField);
+		// Field seqDocNumberField = new IntPoint("SeqDocNumber",
+		// number);
+		// doc.add(seqDocNumberField);
 		Field seqDocNumberField = new IntPoint("SeqDocNumber", number);
 		doc.add(seqDocNumberField);
-		
+
 		// doc.add(new StoredField("StoredSeqDocNumber", number));
 		number++;
 		// TITLE of the reuter
-		//Field title = new TextField("TITLE", reuter.get(0),
-		//	Field.Store.YES);
-		Field title = new Field("TITLE", reuter.get(0),
-			t1);
+		// Field title = new TextField("TITLE", reuter.get(0),
+		// Field.Store.YES);
+		Field title = new Field("TITLE", reuter.get(0), t1);
 		doc.add(title);
 		// BODY of the reuter
 		//Field body = new TextField("BODY", reuter.get(1),
-		//	Field.Store.NO);
-		Field body = new Field("BODY", reuter.get(1),
-			t1);
+		//Field.Store.NO);
+		Field body = new Field("BODY", reuter.get(1), t1);
 		doc.add(body);
 		// TOPICS of the reuter
-		//Field topics = new TextField("TOPICS", reuter.get(2),
-		//	Field.Store.YES);
-		Field topics = new Field("TOPICS", reuter.get(2),
-			t1);
+		// Field topics = new TextField("TOPICS", reuter.get(2),
+		// Field.Store.YES);
+		Field topics = new Field("TOPICS", reuter.get(2), t1);
 		doc.add(topics);
 		// DATELINE of the reuter
-		//Field dateline = new TextField("DATELINE", reuter.get(3),
-		//	Field.Store.YES);
-		Field dateline = new Field("DATELINE", reuter.get(3),
-			t1);
+		// Field dateline = new TextField("DATELINE", reuter.get(3),
+		// Field.Store.YES);
+		Field dateline = new Field("DATELINE", reuter.get(3), t1);
 		doc.add(dateline);
 		// DATE of the reuter
-		//Field date = new StringField("DATE", processDate(reuter.get(4)),
-		//	Field.Store.YES);
-		Field date = new Field("DATE", processDate(reuter.get(4)),
-			t2);
+		// Field date = new StringField("DATE",
+		// processDate(reuter.get(4)),
+		// Field.Store.YES);
+		Field date = new Field("DATE", processDate(reuter.get(4)), t2);
 		doc.add(date);
 		// Hostname who execute the thread
-		//Field hostname = new StringField("Hostname",
-		//	InetAddress.getLocalHost().getHostName(),
-		//	Field.Store.YES);
+		// Field hostname = new StringField("Hostname",
+		// InetAddress.getLocalHost().getHostName(),
+		// Field.Store.YES);
 		Field hostname = new Field("Hostname",
-			InetAddress.getLocalHost().getHostName(),
-			t2);
+			InetAddress.getLocalHost().getHostName(), t2);
 		doc.add(hostname);
 		// Thread executed
-		//Field thread = new StringField("Thread",
-		//	Thread.currentThread().getName(), Field.Store.YES);
-		//doc.add(thread);
+		// Field thread = new StringField("Thread",
+		// Thread.currentThread().getName(), Field.Store.YES);
+		// doc.add(thread);
 		Field thread = new Field("Thread",
 			Thread.currentThread().getName(), t2);
 		doc.add(thread);
@@ -213,7 +208,7 @@ public class Indexer {
     private static String processDate(String date) {
 	Date parsedDate = null;
 	final SimpleDateFormat format = new SimpleDateFormat(
-		    "dd-MMM-yyyy HH:mm:ss.SS", Locale.US);
+		"dd-MMM-yyyy HH:mm:ss.SS", Locale.US);
 
 	try {
 	    parsedDate = format.parse(date);
