@@ -56,15 +56,17 @@ public class MostSimilarDoc_Threading {
 	    Field SimPathSgmField = null;
 	    Field SimTitle = null;
 	    Field SimBody = null;
+	    StringTokenizer st = null;
+	    String token = null;
 
 	    try {
 		for (int i = initialDoc; i < finalDoc; i++) {
 		    doc = reader.document(i);
 
 		    bqBuilder = new BooleanQuery.Builder();
-		    StringTokenizer st = new StringTokenizer(doc.get("TITLE"));
+		    st = new StringTokenizer(doc.get("TITLE"));
 		    while (st.hasMoreTokens()) {
-			String token = st.nextToken();
+			token = st.nextToken();
 			query1 = new TermQuery(new Term("TITLE", token));
 			query2 = new TermQuery(new Term("BODY", token));
 			bqBuilder.add(query1, Occur.SHOULD);
@@ -134,16 +136,18 @@ public class MostSimilarDoc_Threading {
 	    Field SimTitle = null;
 	    Field SimBody = null;
 	    Field SimQuery = null;
+	    StringTokenizer st = null;
+	    String token = null;
 
 	    try {
 		for (int i = initialDoc; i < finalDoc; i++) {
 		    doc = reader.document(i);
 
 		    bqBuilder = new BooleanQuery.Builder();
-		    //llamo a funcion de Anton
-		    StringTokenizer st = new StringTokenizer(doc.get("TITLE"));
+		    //llamo a funcion de Anton para body e itero
+		    st = new StringTokenizer(doc.get("BODY"));
 		    while (st.hasMoreTokens()) {
-			String token = st.nextToken();
+			token = st.nextToken();
 			query1 = new TermQuery(new Term("TITLE", token));
 			query2 = new TermQuery(new Term("BODY", token));
 			bqBuilder.add(query1, Occur.SHOULD);
@@ -177,7 +181,7 @@ public class MostSimilarDoc_Threading {
 		    doc.add(SimQuery);
 
 		    writer.addDocument(doc);
-		    System.out.println("Processed Document number: " + i);
+		    System.out.println("Processed Document number: " + i +" with query: "+  query);
 		}
 	    } catch (IOException e) {
 		e.printStackTrace();
