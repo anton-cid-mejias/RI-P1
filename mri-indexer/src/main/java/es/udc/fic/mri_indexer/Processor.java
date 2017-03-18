@@ -70,7 +70,7 @@ public class Processor {
 	printTfIdfTerms(listTerms, n, field, asc);
     }
 
-    private static Map<String, Integer> getTermFrequencies(
+    public static Map<String, Integer> getTermFrequencies(
 	    IndexReader indexReader, String field) throws IOException {
 
 	Map<String, Integer> termMap = new HashMap<>();
@@ -125,7 +125,7 @@ public class Processor {
 				.nextDoc()) != PostingsEnum.NO_MORE_DOCS) {
 
 			    double tf = postingsEnum.freq();
-			    if (tf>=1){
+			    if (tf >= 1) {
 				tf = 1 + Math.log(tf);
 			    }
 			    listTerms.add(new TermTfIdf(termValue,
@@ -139,6 +139,7 @@ public class Processor {
 	}
 	return listTerms;
     }
+
     /*
      * private static Map<String, Integer> getTermDocFrequencies( IndexReader
      * reader, int docId, String field) throws IOException { Terms vector =
@@ -152,6 +153,58 @@ public class Processor {
      * termsEnum.totalTermFreq(); frequencies.put(term, freq); } return
      * frequencies; }
      */
+
+    public static List<String> getBestTerms(IndexReader indexReader, int docId,
+	    String field, int n ,HashMap<String,Integer> termMap) throws IOException {
+	
+	int numberDocuments = indexReader.numDocs();
+	List<PairTermTfIdf> listTermTfIdf = new ArrayList<>();
+	List<String> listTerms = new ArrayList<>();
+	
+	for (final LeafReaderContext leaf : indexReader.leaves()) {
+	    
+	    try (LeafReader leafReader = leaf.reader()) {
+		@SuppressWarnings("rawtypes")
+		Iterator it = termMap.entrySet().iterator();
+
+		while (it.hasNext()) {
+		    @SuppressWarnings("rawtypes")
+		    Map.Entry pair = (Map.Entry) it.next();
+		    
+		    final double idf = Math.log(
+			    (float) numberDocuments / ((int) pair.getValue()));
+		    String termValue = (String) pair.getKey();
+		    final Term term = new Term(field, termValue);
+		    final PostingsEnum postingsEnum = leafReader.postings(term);
+
+		    if (postingsEnum != null) {
+			while ((postingsEnum
+				.nextDoc()) != PostingsEnum.NO_MORE_DOCS) {
+			    if (postingsEnum.docID() == docId) {
+				double tf = postingsEnum.freq();
+				if (tf >= 1) {
+				    tf = 1 + Math.log(tf);
+				}
+				double tfIdf = tf*idf;
+				listTermTfIdf.add(new PairTermTfIdf(termValue,tfIdf));
+				break;
+			    }
+
+			}
+		    }
+		}
+		Collections.sort(listTermTfIdf);
+		int size = listTermTfIdf.size();
+		if (size<n){
+		    n = size;
+		}
+		for (int i=0; i<n; i++){
+		    listTerms.add(listTermTfIdf.get(i).getTerm());
+		}
+	    }
+	}
+	return listTerms;
+    }
 
     private static void printIdfTerms(List<TermIdf> list, int n, String field,
 	    boolean asc) {
