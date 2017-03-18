@@ -38,7 +38,6 @@ public class ReutersIndexFromIndexCreatorUi {
 	    } else if ("-deldocsquery".equals(args[i])) {
 		query = args[i + 1];
 		i++;
-		i++;
 		option_number++;
 	    } else if ("-mostsimilardoc_title".equals(args[i])) {
 		title_threads = Integer.parseInt(args[i + 1]);
@@ -76,8 +75,16 @@ public class ReutersIndexFromIndexCreatorUi {
 	    } else if (query != null) {
 		IndexFromIndexCreator.deldocsQuery(indexin, indexout, query);
 	    } else if (title_threads != null) {
-		// call to function
+		if (title_threads < 1){
+		    System.out.println("You must input at least 1 thread");
+		    System.exit(1);
+		}
+		MostSimilarDoc_TitleThreading.startThreads(indexin, indexout, title_threads);
 	    } else if (body_threads != null) {
+		if (body_threads < 1){
+		    System.out.println("You must input at least 1 thread");
+		    System.exit(1);
+		}
 		// call to function
 	    }
 	}

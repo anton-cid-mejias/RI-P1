@@ -30,7 +30,11 @@ public class IndexFromIndexCreator {
 	    }
 	    Analyzer analyzer = new StandardAnalyzer();
 	    IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-	    iwc.setOpenMode(OpenMode.CREATE);
+	    if (indexout != null) {
+		iwc.setOpenMode(OpenMode.CREATE);
+	    } else {
+		iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
+	    }
 	    IndexWriter writer = new IndexWriter(dir, iwc);
 	    if (indexout != null) {
 		writer.addIndexes(FSDirectory.open(Paths.get(indexin)));
@@ -59,7 +63,11 @@ public class IndexFromIndexCreator {
 	    }
 	    Analyzer analyzer = new StandardAnalyzer();
 	    IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-	    iwc.setOpenMode(OpenMode.CREATE);
+	    if (indexout != null) {
+		iwc.setOpenMode(OpenMode.CREATE);
+	    } else {
+		iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
+	    }
 	    IndexWriter writer = new IndexWriter(dir, iwc);
 	    if (indexout != null) {
 		writer.addIndexes(FSDirectory.open(Paths.get(indexin)));
