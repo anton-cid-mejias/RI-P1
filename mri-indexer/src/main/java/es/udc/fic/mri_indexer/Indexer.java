@@ -147,7 +147,7 @@ public class Indexer {
 		doc.add(title);
 		// BODY of the reuter
 		Field body = new TextField("BODY", reuter.get(1),
-			Field.Store.NO);
+			Field.Store.YES);
 		// Field body = new Field("BODY", reuter.get(1), t1);
 		doc.add(body);
 		// TOPICS of the reuter
