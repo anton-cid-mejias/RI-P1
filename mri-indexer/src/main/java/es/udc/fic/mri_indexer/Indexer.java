@@ -133,7 +133,8 @@ public class Indexer {
 		// t1);
 		doc.add(pathsgmField);
 		// Order number in the document
-		Field seqDocNumberField = new IntPoint("SeqDocNumber", number);
+		Field seqDocNumberField = new StringField("SeqDocNumber", Integer.toString(number),
+			Field.Store.YES);
 		doc.add(seqDocNumberField);
 		// Field seqDocNumberField = new IntPoint("SeqDocNumber",
 		// number);
