@@ -225,6 +225,7 @@ public class Indexer {
 	if (i > p) {
 	    extension = fileName.substring(i + 1);
 	}
+	//Check if file extension is sgm
 	if (extension.equalsIgnoreCase("sgm")) {
 	    fileName = fileName.substring(p + 1);
 	    if (fileName.length() != 13) {
