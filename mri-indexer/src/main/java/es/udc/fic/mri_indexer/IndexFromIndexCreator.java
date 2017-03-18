@@ -44,7 +44,7 @@ public class IndexFromIndexCreator {
 
 	} catch (IOException e) {
 	    e.printStackTrace();
-	    System.exit(1);
+	    System.exit(-1);
 	}
     }
 
@@ -77,7 +77,7 @@ public class IndexFromIndexCreator {
 
 	} catch (IOException | ParseException e) {
 	    e.printStackTrace();
-	    System.exit(1);
+	    System.exit(-1);
 	}
     }
 
