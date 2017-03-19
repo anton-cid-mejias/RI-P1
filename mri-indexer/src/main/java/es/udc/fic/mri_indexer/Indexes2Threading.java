@@ -62,7 +62,7 @@ public class Indexes2Threading {
 		executor.awaitTermination(1, TimeUnit.HOURS);
 	    } catch (final InterruptedException e) {
 		e.printStackTrace();
-		System.exit(-2);
+		System.exit(-1);
 	    }
 
 	    writer.close();

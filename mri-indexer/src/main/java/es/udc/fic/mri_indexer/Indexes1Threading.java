@@ -35,7 +35,7 @@ public class Indexes1Threading {
 		Indexer.run(openmode, indexDirectory, documentDirectory);
 	    } catch (IOException e) {
 		e.printStackTrace();
-		System.exit(1);
+		System.exit(-1);
 	    }
 	}
     }
@@ -65,7 +65,7 @@ public class Indexes1Threading {
 	    executor.awaitTermination(1, TimeUnit.HOURS);
 	} catch (final InterruptedException e) {
 	    e.printStackTrace();
-	    System.exit(-2);
+	    System.exit(-1);
 	}
 
 	// merge indexes

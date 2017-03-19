@@ -77,13 +77,13 @@ public class ReutersIndexFromIndexCreatorUi {
 	    } else if (title_threads != null) {
 		if (title_threads < 1){
 		    System.out.println("You must input at least 1 thread");
-		    System.exit(1);
+		    System.exit(-1);
 		}
 		MostSimilarDoc_Threading.startThreads(indexin, indexout, null, title_threads);
 	    } else if (body_threads != null) {
 		if (body_threads < 1){
 		    System.out.println("You must input at least 1 thread");
-		    System.exit(1);
+		    System.exit(-1);
 		}
 		MostSimilarDoc_Threading.startThreads(indexin, indexout, n_best_terms, body_threads);
 	    }

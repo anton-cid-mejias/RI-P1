@@ -132,8 +132,8 @@ public class Indexer {
 		// t1);
 		doc.add(pathsgmField);
 		// Order number in the document
-		Field seqDocNumberField = new StringField("SeqDocNumber", Integer.toString(number),
-			Field.Store.YES);
+		Field seqDocNumberField = new StringField("SeqDocNumber",
+			Integer.toString(number), Field.Store.YES);
 		doc.add(seqDocNumberField);
 		// Field seqDocNumberField = new IntPoint("SeqDocNumber",
 		// number);
@@ -216,7 +216,7 @@ public class Indexer {
     }
 
     private static boolean checkSgm(Path file) {
-	// reut2-xxx.sgm? de momento acepta cualquier .sgm
+	//Check if the file is like reut2-xxx.sgm, being x a number
 
 	String extension = "";
 	String fileName = file.toString();
@@ -225,7 +225,26 @@ public class Indexer {
 	if (i > p) {
 	    extension = fileName.substring(i + 1);
 	}
+	//Check if file extension is sgm
 	if (extension.equalsIgnoreCase("sgm")) {
+	    fileName = fileName.substring(p + 1);
+	    if (fileName.length() != 13) {
+		return false;
+	    }
+	    char[] charArray = fileName.toCharArray();
+	    if ((charArray[0] != 'r') || (charArray[1] != 'e')
+		    || (charArray[2] != 'u') || (charArray[3] != 't')
+		    || (charArray[4] != '2') || (charArray[5] != '-')) {
+		return false;
+	    }
+	    //Check the xxx numbers
+	    try  {
+		Integer.parseInt(String.valueOf(charArray[6]));
+		Integer.parseInt(String.valueOf(charArray[7]));
+		Integer.parseInt(String.valueOf(charArray[8]));
+	    } catch (NumberFormatException e){
+		return false;
+	    }
 	    return true;
 	}
 	return false;

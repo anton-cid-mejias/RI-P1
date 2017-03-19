@@ -32,7 +32,7 @@ public class ReutersIndexerUi {
 			&& (!openmodeString.equals("create_or_append"))) {
 		    System.err.println(
 			    "Openmode must be: append, create or append_or_create.");
-		    System.exit(1);
+		    System.exit(-1);
 		}
 		i++;
 	    } else if ("-index".equals(args[i])) {
@@ -92,7 +92,7 @@ public class ReutersIndexerUi {
 	    if (!colls.isEmpty()) {
 		if (colls.size() != (indexes1.size() -1)){
 		    System.out.println("There must be as many indexes as document folders");
-		    System.exit(1);
+		    System.exit(-1);
 		}
 		CheckIndexOrDocumentDirectories.check_directories(colls, false);
 		Indexes1Threading.startThreads(openmode, indexes1, colls);

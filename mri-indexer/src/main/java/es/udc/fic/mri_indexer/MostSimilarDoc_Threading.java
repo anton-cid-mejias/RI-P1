@@ -2,6 +2,8 @@ package es.udc.fic.mri_indexer;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -111,15 +113,17 @@ public class MostSimilarDoc_Threading {
 	private final int finalDoc;
 	private final DirectoryReader reader;
 	private final IndexWriter writer;
-	private final Integer n_best_terms;
+	private final int n_best_terms;
+	private final Map<String, Integer> termMap;
 
 	public BodyThread(int initialDoc, int finalDoc, DirectoryReader reader,
-		IndexWriter writer, Integer n_best_terms) {
+		IndexWriter writer, int n_best_terms, Map<String, Integer> termMap) {
 	    this.initialDoc = initialDoc;
 	    this.finalDoc = finalDoc;
 	    this.reader = reader;
 	    this.writer = writer;
 	    this.n_best_terms = n_best_terms;
+	    this.termMap = termMap;
 	}
 
 	@Override
@@ -136,23 +140,21 @@ public class MostSimilarDoc_Threading {
 	    Field SimTitle = null;
 	    Field SimBody = null;
 	    Field SimQuery = null;
-	    StringTokenizer st = null;
-	    String token = null;
+	    List<String> terms = null;
 
 	    try {
 		for (int i = initialDoc; i < finalDoc; i++) {
 		    doc = reader.document(i);
 
 		    bqBuilder = new BooleanQuery.Builder();
-		    //llamo a funcion de Anton para body e itero
-		    st = new StringTokenizer(doc.get("BODY"));
-		    while (st.hasMoreTokens()) {
-			token = st.nextToken();
+		    terms = Processor.getBestTerms(reader, i, "BODY", n_best_terms, termMap);
+		    for(String token : terms){
 			query1 = new TermQuery(new Term("TITLE", token));
 			query2 = new TermQuery(new Term("BODY", token));
 			bqBuilder.add(query1, Occur.SHOULD);
 			bqBuilder.add(query2, Occur.SHOULD);
 		    }
+
 		    query = bqBuilder.build();
 
 		    topDocs = searcher.search(query, 1);
@@ -172,7 +174,7 @@ public class MostSimilarDoc_Threading {
 			SimBody = new TextField("SimBody", queryDoc.get("BODY"),
 				Field.Store.YES);
 		    }
-		    SimQuery = new StringField("SimPathSgm", query.toString(),
+		    SimQuery = new StringField("SimQuery", query.toString(),
 			    Field.Store.YES);
 
 		    doc.add(SimPathSgmField);
@@ -181,7 +183,7 @@ public class MostSimilarDoc_Threading {
 		    doc.add(SimQuery);
 
 		    writer.addDocument(doc);
-		    System.out.println("Processed Document number: " + i +" with query: "+  query);
+		    System.out.println("Processed Document number: " + i);
 		}
 	    } catch (IOException e) {
 		e.printStackTrace();
@@ -227,9 +229,11 @@ public class MostSimilarDoc_Threading {
 		    executor.execute(worker);
 		}
 	    } else {
+		Map<String, Integer> termMap = Processor.getTermFrequencies(reader, "BODY");
 		for (int j = 0; j <= number_threads - 1; j++) {
 		    final Runnable worker = new BodyThread(threadDocRange[j],
-			    threadDocRange[j + 1], reader, writer, n_best_terms);
+			    threadDocRange[j + 1], reader, writer, n_best_terms, 
+			    termMap);
 		    executor.execute(worker);
 		}
 	    }
@@ -239,7 +243,7 @@ public class MostSimilarDoc_Threading {
 		executor.awaitTermination(1, TimeUnit.HOURS);
 	    } catch (final InterruptedException e) {
 		e.printStackTrace();
-		System.exit(-2);
+		System.exit(-1);
 	    }
 
 	    reader.close();
@@ -247,7 +251,7 @@ public class MostSimilarDoc_Threading {
 
 	} catch (IOException e) {
 	    e.printStackTrace();
-	    System.exit(1);
+	    System.exit(-1);
 	}
     }
 
