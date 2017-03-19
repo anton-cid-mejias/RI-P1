@@ -58,6 +58,9 @@ public class MostSimilarDoc_Threading {
 	    Field SimPathSgmField = null;
 	    Field SimTitle = null;
 	    Field SimBody = null;
+	    String SimPathSgmString = null;
+	    String SimTitleString = null;
+	    String SimBodyString = null;
 	    StringTokenizer st = null;
 	    String token = null;
 
@@ -75,24 +78,41 @@ public class MostSimilarDoc_Threading {
 			bqBuilder.add(query2, Occur.SHOULD);
 		    }
 		    query = bqBuilder.build();
+		    
+		    topDocs = searcher.search(query, 2);
 
-		    topDocs = searcher.search(query, 1);
-
+		    //The searcher will not find itself
 		    if (topDocs.totalHits == 0) {
-			SimPathSgmField = new StringField("SimPathSgm", "",
-				Field.Store.YES);
-			SimTitle = new TextField("SimTitle", "",
-				Field.Store.YES);
-			SimBody = new TextField("SimBody", "", Field.Store.YES);
+			SimPathSgmString = "";
+			SimTitleString = "";
+			SimBodyString = "";
 		    } else {
 			queryDoc = reader.document(topDocs.scoreDocs[0].doc);
-			SimPathSgmField = new StringField("SimPathSgm",
-				queryDoc.get("PathSgm"), Field.Store.YES);
-			SimTitle = new TextField("SimTitle",
-				queryDoc.get("TITLE"), Field.Store.YES);
-			SimBody = new TextField("SimBody", queryDoc.get("BODY"),
-				Field.Store.YES);
+			if (queryDoc.equals(doc)) {
+			    if (topDocs.totalHits == 1) {
+				SimPathSgmString = "";
+				SimTitleString = "";
+				SimBodyString = "";
+			    } else {
+				queryDoc = reader
+					.document(topDocs.scoreDocs[1].doc);
+				SimPathSgmString = queryDoc.get("PathSgm");
+				SimTitleString = queryDoc.get("TITLE");
+				SimBodyString = queryDoc.get("BODY");
+			    }
+			} else {
+			    SimPathSgmString = queryDoc.get("PathSgm");
+			    SimTitleString = queryDoc.get("TITLE");
+			    SimBodyString = queryDoc.get("BODY");
+			}
+
 		    }
+		    SimPathSgmField = new StringField("SimPathSgm",
+			    SimPathSgmString, Field.Store.YES);
+		    SimTitle = new TextField("SimTitle", SimTitleString,
+			    Field.Store.YES);
+		    SimBody = new TextField("SimBody", SimBodyString,
+			    Field.Store.YES);
 		    doc.add(SimPathSgmField);
 		    doc.add(SimTitle);
 		    doc.add(SimBody);
@@ -117,7 +137,8 @@ public class MostSimilarDoc_Threading {
 	private final Map<String, Integer> termMap;
 
 	public BodyThread(int initialDoc, int finalDoc, DirectoryReader reader,
-		IndexWriter writer, int n_best_terms, Map<String, Integer> termMap) {
+		IndexWriter writer, int n_best_terms,
+		Map<String, Integer> termMap) {
 	    this.initialDoc = initialDoc;
 	    this.finalDoc = finalDoc;
 	    this.reader = reader;
@@ -140,6 +161,9 @@ public class MostSimilarDoc_Threading {
 	    Field SimTitle = null;
 	    Field SimBody = null;
 	    Field SimQuery = null;
+	    String SimPathSgmString = null;
+	    String SimTitleString = null;
+	    String SimBodyString = null;
 	    List<String> terms = null;
 
 	    try {
@@ -147,8 +171,9 @@ public class MostSimilarDoc_Threading {
 		    doc = reader.document(i);
 
 		    bqBuilder = new BooleanQuery.Builder();
-		    terms = Processor.getBestTerms(reader, i, "BODY", n_best_terms, termMap);
-		    for(String token : terms){
+		    terms = Processor.getBestTerms(reader, i, "BODY",
+			    n_best_terms, termMap);
+		    for (String token : terms) {
 			query1 = new TermQuery(new Term("TITLE", token));
 			query2 = new TermQuery(new Term("BODY", token));
 			bqBuilder.add(query1, Occur.SHOULD);
@@ -157,23 +182,40 @@ public class MostSimilarDoc_Threading {
 
 		    query = bqBuilder.build();
 
-		    topDocs = searcher.search(query, 1);
+		    topDocs = searcher.search(query, 2);
 
+		  //The searcher will not find itself
 		    if (topDocs.totalHits == 0) {
-			SimPathSgmField = new StringField("SimPathSgm", "",
-				Field.Store.YES);
-			SimTitle = new TextField("SimTitle", "",
-				Field.Store.YES);
-			SimBody = new TextField("SimBody", "", Field.Store.YES);
+			SimPathSgmString = "";
+			SimTitleString = "";
+			SimBodyString = "";
 		    } else {
 			queryDoc = reader.document(topDocs.scoreDocs[0].doc);
-			SimPathSgmField = new StringField("SimPathSgm",
-				queryDoc.get("PathSgm"), Field.Store.YES);
-			SimTitle = new TextField("SimTitle",
-				queryDoc.get("TITLE"), Field.Store.YES);
-			SimBody = new TextField("SimBody", queryDoc.get("BODY"),
-				Field.Store.YES);
+			if (queryDoc.equals(doc)) {
+			    if (topDocs.totalHits == 1) {
+				SimPathSgmString = "";
+				SimTitleString = "";
+				SimBodyString = "";
+			    } else {
+				queryDoc = reader
+					.document(topDocs.scoreDocs[1].doc);
+				SimPathSgmString = queryDoc.get("PathSgm");
+				SimTitleString = queryDoc.get("TITLE");
+				SimBodyString = queryDoc.get("BODY");
+			    }
+			} else {
+			    SimPathSgmString = queryDoc.get("PathSgm");
+			    SimTitleString = queryDoc.get("TITLE");
+			    SimBodyString = queryDoc.get("BODY");
+			}
+
 		    }
+		    SimPathSgmField = new StringField("SimPathSgm",
+			    SimPathSgmString, Field.Store.YES);
+		    SimTitle = new TextField("SimTitle", SimTitleString,
+			    Field.Store.YES);
+		    SimBody = new TextField("SimBody", SimBodyString,
+			    Field.Store.YES);
 		    SimQuery = new StringField("SimQuery", query.toString(),
 			    Field.Store.YES);
 
@@ -220,8 +262,9 @@ public class MostSimilarDoc_Threading {
 
 	    final ExecutorService executor = Executors
 		    .newFixedThreadPool(number_threads);
-	    
-	    //If n_best_terms is null we are using most similart title, else, most similar body
+
+	    // If n_best_terms is null we are using most similart title, else,
+	    // most similar body
 	    if (n_best_terms == null) {
 		for (int j = 0; j <= number_threads - 1; j++) {
 		    final Runnable worker = new TitleThread(threadDocRange[j],
@@ -229,10 +272,11 @@ public class MostSimilarDoc_Threading {
 		    executor.execute(worker);
 		}
 	    } else {
-		Map<String, Integer> termMap = Processor.getTermFrequencies(reader, "BODY");
+		Map<String, Integer> termMap = Processor
+			.getTermFrequencies(reader, "BODY");
 		for (int j = 0; j <= number_threads - 1; j++) {
 		    final Runnable worker = new BodyThread(threadDocRange[j],
-			    threadDocRange[j + 1], reader, writer, n_best_terms, 
+			    threadDocRange[j + 1], reader, writer, n_best_terms,
 			    termMap);
 		    executor.execute(worker);
 		}
