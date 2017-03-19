@@ -2,9 +2,7 @@ package es.udc.fic.mri_indexer;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -18,12 +16,11 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -48,11 +45,9 @@ public class MostSimilarDoc_Threading {
 	@Override
 	public void run() {
 	    Document doc = null;
+	    int hits = 0;
 	    Document queryDoc = null;
-	    BooleanQuery query = null;
-	    BooleanQuery.Builder bqBuilder = null;
-	    Query query1 = null;
-	    Query query2 = null;
+	    Query query = null;
 	    IndexSearcher searcher = new IndexSearcher(reader);
 	    TopDocs topDocs = null;
 	    Field SimPathSgmField = null;
@@ -61,36 +56,32 @@ public class MostSimilarDoc_Threading {
 	    String SimPathSgmString = null;
 	    String SimTitleString = null;
 	    String SimBodyString = null;
-	    StringTokenizer st = null;
-	    String token = null;
+	    MultiFieldQueryParser parser = new MultiFieldQueryParser(
+		    new String[] { "TITLE", "BODY" }, new StandardAnalyzer());
 
 	    try {
 		for (int i = initialDoc; i < finalDoc; i++) {
 		    doc = reader.document(i);
 
-		    bqBuilder = new BooleanQuery.Builder();
-		    st = new StringTokenizer(doc.get("TITLE"));
-		    while (st.hasMoreTokens()) {
-			token = st.nextToken();
-			query1 = new TermQuery(new Term("TITLE", token));
-			query2 = new TermQuery(new Term("BODY", token));
-			bqBuilder.add(query1, Occur.SHOULD);
-			bqBuilder.add(query2, Occur.SHOULD);
+		    try {
+			query = parser
+				.parse(QueryParser.escape(doc.get("TITLE")));
+			topDocs = searcher.search(query, 2);
+			hits = topDocs.totalHits;
+		    } catch (ParseException e) {
+			hits = 0;
 		    }
-		    query = bqBuilder.build();
 
-		    topDocs = searcher.search(query, 2);
-
-		    if (topDocs.totalHits == 0) {
+		    if (hits == 0) {
 			SimPathSgmString = "";
 			SimTitleString = "";
 			SimBodyString = "";
 		    } else {
 			queryDoc = reader.document(topDocs.scoreDocs[0].doc);
 			// Test if the answer is the original document
-			if ((doc.get("PathSgm") == queryDoc.get("PathSgm"))
-				&& (doc.get("SeqDocNumber") == queryDoc
-					.get("SeqDocNumber"))) {
+			if ((doc.get("PathSgm").equals(queryDoc.get("PathSgm")))
+				&& (doc.get("SeqDocNumber").equals(
+					queryDoc.get("SeqDocNumber")))) {
 			    if (topDocs.totalHits == 1) {
 				SimPathSgmString = "";
 				SimTitleString = "";
@@ -153,10 +144,8 @@ public class MostSimilarDoc_Threading {
 	public void run() {
 	    Document doc = null;
 	    Document queryDoc = null;
-	    BooleanQuery query = null;
-	    BooleanQuery.Builder bqBuilder = null;
-	    Query query1 = null;
-	    Query query2 = null;
+	    Query query = null;
+	    String queryString = null;
 	    IndexSearcher searcher = new IndexSearcher(reader);
 	    TopDocs topDocs = null;
 	    Field SimPathSgmField = null;
@@ -166,27 +155,29 @@ public class MostSimilarDoc_Threading {
 	    String SimPathSgmString = null;
 	    String SimTitleString = null;
 	    String SimBodyString = null;
-	    List<String> terms = null;
+	    String terms = null;
+	    int hits = 0;
+	    MultiFieldQueryParser parser = new MultiFieldQueryParser(
+		    new String[] { "TITLE", "BODY" }, new StandardAnalyzer());
 
 	    try {
 		for (int i = initialDoc; i < finalDoc; i++) {
 		    doc = reader.document(i);
-
-		    bqBuilder = new BooleanQuery.Builder();
 		    terms = Processor.getBestTerms(reader, i, "BODY",
 			    n_best_terms, termMap);
-		    for (String token : terms) {
-			query1 = new TermQuery(new Term("TITLE", token));
-			query2 = new TermQuery(new Term("BODY", token));
-			bqBuilder.add(query1, Occur.SHOULD);
-			bqBuilder.add(query2, Occur.SHOULD);
+		    
+		    try {
+			query = parser
+				.parse(QueryParser.escape(terms));
+			queryString = query.toString();
+			topDocs = searcher.search(query, 2);
+			hits = topDocs.totalHits;
+		    } catch (ParseException e) {
+			queryString = "EMPTY BODY";
+			hits = 0;
 		    }
 
-		    query = bqBuilder.build();
-
-		    topDocs = searcher.search(query, 2);
-
-		    if (topDocs.totalHits == 0) {
+		    if (hits == 0) {
 			SimPathSgmString = "";
 			SimTitleString = "";
 			SimBodyString = "";
@@ -220,7 +211,7 @@ public class MostSimilarDoc_Threading {
 			    Field.Store.YES);
 		    SimBody = new TextField("SimBody", SimBodyString,
 			    Field.Store.YES);
-		    SimQuery = new StringField("SimQuery", query.toString(),
+		    SimQuery = new StringField("SimQuery", queryString,
 			    Field.Store.YES);
 
 		    doc.add(SimPathSgmField);
@@ -250,7 +241,8 @@ public class MostSimilarDoc_Threading {
 	    iwc.setOpenMode(OpenMode.CREATE);
 	    IndexWriter writer = new IndexWriter(outdir, iwc);
 
-	    // Each thread will have the first and last document they need to
+	    // Each thread will have the first and last document they need
+	    // to
 	    // process
 	    int numDocs = reader.numDocs();
 	    int threadDocs = numDocs / number_threads;
@@ -267,7 +259,8 @@ public class MostSimilarDoc_Threading {
 	    final ExecutorService executor = Executors
 		    .newFixedThreadPool(number_threads);
 
-	    // If n_best_terms is null we are using most similart title, else,
+	    // If n_best_terms is null we are using most similart title,
+	    // else,
 	    // most similar body
 	    if (n_best_terms == null) {
 		for (int j = 0; j <= number_threads - 1; j++) {
