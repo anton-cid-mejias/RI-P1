@@ -37,6 +37,7 @@ public class Processor {
 	Map<String, Integer> termMap = new HashMap<>();
 
 	termMap = getTermFrequencies(indexReader, field);
+	indexReader.close();
 
 	@SuppressWarnings("rawtypes")
 	Iterator it = termMap.entrySet().iterator();
@@ -61,9 +62,6 @@ public class Processor {
 	Map<String, Integer> termMap = new HashMap<>();
 
 	termMap = getTermFrequencies(indexReader, field);
-
-	dir = FSDirectory.open(Paths.get(indexFile));
-	indexReader = DirectoryReader.open(dir);
 
 	listTerms = getListTfIdfTerms(indexReader, field, termMap);
 
@@ -151,13 +149,13 @@ public class Processor {
      * frequencies; }
      */
 
-    public static List<String> getBestTerms(IndexReader indexReader, int docId,
+    public static String getBestTerms(IndexReader indexReader, int docId,
 	    String field, int n, Map<String, Integer> termMap)
 	    throws IOException {
 
 	int numberDocuments = indexReader.numDocs();
 	List<PairTermTfIdf> listTermTfIdf = new ArrayList<>();
-	List<String> listTerms = new ArrayList<>();
+	StringBuilder strings = new StringBuilder();
 
 	for (final LeafReaderContext leaf : indexReader.leaves()) {
 
@@ -206,9 +204,10 @@ public class Processor {
 	    n = size;
 	}
 	for (int i = 0; i < n; i++) {
-	    listTerms.add(listTermTfIdf.get(i).getTerm());
+	    strings.append(listTermTfIdf.get(i).getTerm());
+	    strings.append(" ");
 	}
-	return listTerms;
+	return strings.toString();
     }
 
     private static void printIdfTerms(List<TermIdf> list, int n, String field,

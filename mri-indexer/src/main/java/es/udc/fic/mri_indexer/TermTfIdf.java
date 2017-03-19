@@ -40,8 +40,8 @@ public class TermTfIdf implements Comparable<TermTfIdf> {
 
     @Override
     public String toString() {
-	return "	term=" + term + "	docId=" + docId + "	tfIdf="
-		+ tfIdf + "	tf=" + tf + "	idf=" + idf;
+	return " term=" + term + " docId=" + docId + " tfIdf="
+		+ tfIdf + " tf=" + tf + " idf=" + idf;
     }
 
     @Override
