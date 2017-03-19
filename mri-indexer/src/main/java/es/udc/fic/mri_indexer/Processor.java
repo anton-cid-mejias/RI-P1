@@ -191,22 +191,22 @@ public class Processor {
 
 		    }
 		}
-		Collections.sort(listTermTfIdf);
-		/*	new Comparator<PairTermTfIdf>() {
-			    @Override
-			    public int compare(PairTermTfIdf a,
-				    PairTermTfIdf b) {
-				return b.compareTo(a);
-			    }
-			});*/
-		int size = listTermTfIdf.size();
-		if (size < n) {
-		    n = size;
-		}
-		for (int i = 0; i < n; i++) {
-		    listTerms.add(listTermTfIdf.get(i).getTerm());
-		}
+
 	    }
+
+	}
+	Collections.sort(listTermTfIdf, new Comparator<PairTermTfIdf>() {
+	    @Override
+	    public int compare(PairTermTfIdf a, PairTermTfIdf b) {
+		return b.compareTo(a);
+	    }
+	});
+	int size = listTermTfIdf.size();
+	if (size < n) {
+	    n = size;
+	}
+	for (int i = 0; i < n; i++) {
+	    listTerms.add(listTermTfIdf.get(i).getTerm());
 	}
 	return listTerms;
     }
