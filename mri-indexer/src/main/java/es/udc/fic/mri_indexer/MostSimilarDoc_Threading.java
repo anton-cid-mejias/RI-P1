@@ -78,17 +78,19 @@ public class MostSimilarDoc_Threading {
 			bqBuilder.add(query2, Occur.SHOULD);
 		    }
 		    query = bqBuilder.build();
-		    
+
 		    topDocs = searcher.search(query, 2);
 
-		    //The searcher will not find itself
 		    if (topDocs.totalHits == 0) {
 			SimPathSgmString = "";
 			SimTitleString = "";
 			SimBodyString = "";
 		    } else {
 			queryDoc = reader.document(topDocs.scoreDocs[0].doc);
-			if (queryDoc.equals(doc)) {
+			// Test if the answer is the original document
+			if ((doc.get("PathSgm") == queryDoc.get("PathSgm"))
+				&& (doc.get("SeqDocNumber") == queryDoc
+					.get("SeqDocNumber"))) {
 			    if (topDocs.totalHits == 1) {
 				SimPathSgmString = "";
 				SimTitleString = "";
@@ -184,14 +186,16 @@ public class MostSimilarDoc_Threading {
 
 		    topDocs = searcher.search(query, 2);
 
-		  //The searcher will not find itself
 		    if (topDocs.totalHits == 0) {
 			SimPathSgmString = "";
 			SimTitleString = "";
 			SimBodyString = "";
 		    } else {
 			queryDoc = reader.document(topDocs.scoreDocs[0].doc);
-			if (queryDoc.equals(doc)) {
+			// Test if the answer is the original document
+			if ((doc.get("PathSgm").equals(queryDoc.get("PathSgm")))
+				&& (doc.get("SeqDocNumber").equals(
+					queryDoc.get("SeqDocNumber")))) {
 			    if (topDocs.totalHits == 1) {
 				SimPathSgmString = "";
 				SimTitleString = "";
@@ -272,6 +276,11 @@ public class MostSimilarDoc_Threading {
 		    executor.execute(worker);
 		}
 	    } else {
+		if (n_best_terms > 512) {
+		    // Boolean Query cannot accept more than 1024 terms
+		    // each term is used two times
+		    n_best_terms = 512;
+		}
 		Map<String, Integer> termMap = Processor
 			.getTermFrequencies(reader, "BODY");
 		for (int j = 0; j <= number_threads - 1; j++) {
