@@ -193,7 +193,12 @@ public class Processor {
 			}
 		    }
 		}
-		Collections.sort(listTermTfIdf);
+		Collections.sort(listTermTfIdf, new Comparator<PairTermTfIdf>() {
+			@Override
+			public int compare(PairTermTfIdf a, PairTermTfIdf b) {
+			    return b.compareTo(a);
+			}
+		    });
 		int size = listTermTfIdf.size();
 		if (size<n){
 		    n = size;
